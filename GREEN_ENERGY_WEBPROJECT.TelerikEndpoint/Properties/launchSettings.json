@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "GREEN_ENERGY_WEBPROJECT.TelerikEndpoint": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:51290;http://localhost:51291"
+    }
+  }
+}
