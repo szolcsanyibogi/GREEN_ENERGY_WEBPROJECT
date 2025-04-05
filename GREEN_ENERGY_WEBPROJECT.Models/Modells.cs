@@ -87,7 +87,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2023 { get; set; }
     }
 
-    public class Waste
+    public class WASTE
     {
         public int Waste_ID { get; set; }
         public string Waste_Metric { get; set; }
@@ -100,7 +100,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2023 { get; set; }
     }
 
-    public class Water
+    public class WATER
     {
         public int Water_ID { get; set; }
         public string Water_Metric { get; set; }
@@ -113,12 +113,13 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2023 { get; set; }
     }
 
-    public class WaterByRegio
+    public class WATERBYREGIO
     {
         public int Water_By_Regio_ID { get; set; }
         public string Regio { get; set; }
         public string Factory { get; set; }
         public string Unit { get; set; }
+        public string Category { get; set; }
         public float year_2019 { get; set; }
         public float year_2020 { get; set; }
         public float year_2021 { get; set; }

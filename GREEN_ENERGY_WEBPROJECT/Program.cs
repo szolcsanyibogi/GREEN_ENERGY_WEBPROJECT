@@ -1,6 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using GREEN_ENERGY_WEBPROJECT.Repository;
 using Microsoft.Data.SqlClient;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 Console.WriteLine("Hello, World!");
 
@@ -14,6 +16,8 @@ using (SqlConnection con = new SqlConnection(ConnectionString))
     SqlCommand cmd = new SqlCommand(Query, con);
 
     SqlDataReader reader = cmd.ExecuteReader();
+
+    
 
     // Print the column names first
     Console.WriteLine("PUE_ID\tCountry");
@@ -29,6 +33,7 @@ using (SqlConnection con = new SqlConnection(ConnectionString))
 
     reader.Close();
 }
+
 
 Console.WriteLine("\nPress any key to exit...");
 Console.ReadKey();
