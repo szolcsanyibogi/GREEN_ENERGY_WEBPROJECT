@@ -17,7 +17,12 @@ string ConnectionString_STAR = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_
 var repo1 = new Repository(ConnectionString_STAR);
 var repo2 = new Repository_PUT(ConnectionString_DW);
 
-repo1.GetDATE(2020);
+//repo2.PutPUE("teszt1", "teszt2", "teszt3", "teszt4", 1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
+//repo2.PutWASTE("teszt", "teszt", "teszt", 1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
+//repo2.PutWater("teszt", "teszt", "teszt", 1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
+//repo2.PutGHG("teszt", "teszt", "teszt", 1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
+//repo2.PutWaterByRegio("teszt", "teszt", "teszt", "Water withdrawal", 1.0f, 2.0f, 3.0f, 4.0f, 5.0f);
+//repo2.PutENERGY("teszt", "teszt", "teszt", 123, 123, 123, 123, 123);
 //repo2.PutCFE("teszt", "teszt", "teszt", "teszt", 123);
 
 
