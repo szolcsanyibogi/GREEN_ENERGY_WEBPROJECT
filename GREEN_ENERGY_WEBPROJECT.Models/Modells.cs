@@ -36,7 +36,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
     {
         public int DATE_ID { get; set; }
         public int YEAR { get; set; }
-        public int MONTH { get; set; }
+        //public int MONTH { get; set; }
     }
     public class CFE
     {

@@ -1,38 +1,27 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using GREEN_ENERGY_WEBPROJECT.Repository;
+using GREEN_ENERGY_WEBPROJECT.Repository_PUT;
 using Microsoft.Data.SqlClient;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using GREEN_ENERGY_WEBPROJECT;
+
 
 
 Console.WriteLine("Hello, World!");
 
 
-string ConnectionString = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_DW_GREEN;Integrated Security=True;Trust Server Certificate=True";
 
-using (SqlConnection con = new SqlConnection(ConnectionString))
-{
-    con.Open();
-    string Query = "SELECT TOP (1000) [PUE_ID], [Country] FROM [ATH_DW_GREEN].[dbo].[dw_PUE]";
-    SqlCommand cmd = new SqlCommand(Query, con);
 
-    SqlDataReader reader = cmd.ExecuteReader();
+string ConnectionString_DW = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_DW_GREEN;Integrated Security=True;Trust Server Certificate=True";
+string ConnectionString_STAR = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_STAR_GREEN;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
 
-    
+var repo1 = new Repository(ConnectionString_STAR);
+var repo2 = new Repository_PUT(ConnectionString_DW);
 
-    // Print the column names first
-    Console.WriteLine("PUE_ID\tCountry");
+repo1.GetDATE(2020);
+//repo2.PutCFE("teszt", "teszt", "teszt", "teszt", 123);
 
-    // Loop through the rows and print them
-    while (reader.Read())
-    {
-        int pueId = reader.GetInt32(0); // Column 0: PUE_ID
-        string country = reader.IsDBNull(1) ? "NULL" : reader.GetString(1); // Column 1: Country
 
-        Console.WriteLine($"{pueId}\t{country}");
-    }
 
-    reader.Close();
-}
 
 
 Console.WriteLine("\nPress any key to exit...");
