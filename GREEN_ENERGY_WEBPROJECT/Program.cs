@@ -5,12 +5,6 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using GREEN_ENERGY_WEBPROJECT;
 using GREEN_ENERGY_WEBPROJECT.Models;
 
-
-
-
-
-
-
 string ConnectionString_DW = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_DW_GREEN;Integrated Security=True;Trust Server Certificate=True";
 string ConnectionString_STAR = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_STAR_GREEN;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
 
@@ -20,9 +14,12 @@ var repo2 = new Repository_PUT(ConnectionString_DW);
 //repo1.GetFACTS(184, 2019, 9, 8);
 
 //var r1 = repo1.GetUNIT(1);
+//List<UNIT> r1 = repo1.GetUNIT_NAME("Gj");
 //var r2 = repo1.GetMETRIC(1);
+//List<METRIC> r2 = repo1.GetMETRIC_NAME("Fuel");
 //var r3 = repo1.GetDATE(2020);
 //var r4 = repo1.GetFACTORY(1);
+//List<FACTORY> r4 = repo1.GetFACTORY_NAME("Google");
 
 //List<FACT> facts = repo1.GetFACTS_BY_FACTORYID(1);
 
@@ -35,7 +32,7 @@ var repo2 = new Repository_PUT(ConnectionString_DW);
 //repo2.PutCFE("teszt", "teszt", "teszt", "teszt", 123);
 
 
-
+;
 
 
 Console.WriteLine("\nPress any key to exit...");

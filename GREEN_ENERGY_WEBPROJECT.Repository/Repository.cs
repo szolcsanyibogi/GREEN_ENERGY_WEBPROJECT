@@ -245,6 +245,110 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
             }
         }
 
+        public List<FACTORY> GetFACTORY_NAME(string FACTORY_NAME)
+        {
+            string query = "SELECT [FACTORY_ID], [FACTORY_NAME], [COUNTRY], [LOCATION], [REGIO] FROM [ATH_STAR_GREEN].[dbo].[DIM_FACTORY] WHERE FACTORY_NAME = @FACTORY_NAME";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@FACTORY_NAME", FACTORY_NAME);
+
+            List<FACTORY> factories = new List<FACTORY>();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    factories.Add(new FACTORY()
+                    {
+                        FACTORY_ID = reader.GetInt32(0),
+                        FACTORY_NAME = reader.GetString(1),
+                        COUNTRY = reader.GetString(2),
+                        LOCATION = reader.GetString(3),
+                        REGIO = reader.GetString(4)
+                    });
+                }
+            }
+
+            return factories;
+        }
+
+        public List<FACTORY> GetFACTORY_COUNTRY(string COUNTRY)
+        {
+            string query = "SELECT [FACTORY_ID], [FACTORY_NAME], [COUNTRY], [LOCATION], [REGIO] FROM [ATH_STAR_GREEN].[dbo].[DIM_FACTORY] WHERE COUNTRY = @COUNTRY";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@COUNTRY", COUNTRY);
+
+            List<FACTORY> factories = new List<FACTORY>();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    factories.Add(new FACTORY()
+                    {
+                        FACTORY_ID = reader.GetInt32(0),
+                        FACTORY_NAME = reader.GetString(1),
+                        COUNTRY = reader.GetString(2),
+                        LOCATION = reader.GetString(3),
+                        REGIO = reader.GetString(4)
+                    });
+                }
+            }
+
+            return factories;
+        }
+
+        public List<FACTORY> GetFACTORY_LOCATION(string LOCATION)
+        {
+            string query = "SELECT [FACTORY_ID], [FACTORY_NAME], [COUNTRY], [LOCATION], [REGIO] FROM [ATH_STAR_GREEN].[dbo].[DIM_FACTORY] WHERE LOCATION = @LOCATION";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@LOCATION", LOCATION);
+
+            List<FACTORY> factories = new List<FACTORY>();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    factories.Add(new FACTORY()
+                    {
+                        FACTORY_ID = reader.GetInt32(0),
+                        FACTORY_NAME = reader.GetString(1),
+                        COUNTRY = reader.GetString(2),
+                        LOCATION = reader.GetString(3),
+                        REGIO = reader.GetString(4)
+                    });
+                }
+            }
+
+            return factories;
+        }
+
+        public List<FACTORY> GetFACTORY_REGIO(string REGIO)
+        {
+            string query = "SELECT [FACTORY_ID], [FACTORY_NAME], [COUNTRY], [LOCATION], [REGIO] FROM [ATH_STAR_GREEN].[dbo].[DIM_FACTORY] WHERE REGIO = @REGIO";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@REGIO", REGIO);
+
+            List<FACTORY> factories = new List<FACTORY>();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    factories.Add(new FACTORY()
+                    {
+                        FACTORY_ID = reader.GetInt32(0),
+                        FACTORY_NAME = reader.GetString(1),
+                        COUNTRY = reader.GetString(2),
+                        LOCATION = reader.GetString(3),
+                        REGIO = reader.GetString(4)
+                    });
+                }
+            }
+
+            return factories;
+        }
+
         public UNIT GetUNIT(int ID)
         {
             string Query = "SELECT [Unit_ID],[Unit_Name] FROM [ATH_STAR_GREEN].[dbo].[dim_Unit] WHERE Unit_ID = @ID";
@@ -262,6 +366,29 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
             }
         }
 
+        public List<UNIT> GetUNIT_NAME(string UNIT_NAME)
+        {
+            string query = "SELECT [Unit_ID],[Unit_Name] FROM [ATH_STAR_GREEN].[dbo].[dim_Unit] WHERE UNIT_NAME = @UNIT_NAME";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@UNIT_NAME", UNIT_NAME);
+
+            List<UNIT> units = new List<UNIT>();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    units.Add(new UNIT()
+                    {
+                        UNIT_ID = reader.GetInt32(0),
+                        UNIT_NAME = reader.GetString(1)
+                    });
+                }
+            }
+
+            return units;
+        }
+
         public METRIC GetMETRIC(int ID)
         {
             string Query = "SELECT [Metric_ID], [Metric_Name] FROM [ATH_STAR_GREEN].[dbo].[dim_Metric] WHERE Metric_ID = @ID";
@@ -277,6 +404,29 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
                     METRIC_NAME = reader.GetString(1)
                 };
             }
+        }
+
+        public List<METRIC> GetMETRIC_NAME(string METRIC_NAME)
+        {
+            string query = "SELECT [Metric_ID], [Metric_Name] FROM [ATH_STAR_GREEN].[dbo].[dim_Metric] WHERE METRIC_NAME = @METRIC_NAME";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@METRIC_NAME", METRIC_NAME);
+
+            List<METRIC> metrics = new List<METRIC>();
+
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    metrics.Add(new METRIC()
+                    {
+                        METRIC_ID = reader.GetInt32(0),
+                        METRIC_NAME = reader.GetString(1)
+                    });
+                }
+            }
+
+            return metrics;
         }
 
         public DATE GetDATE(int ID)

@@ -59,7 +59,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public int year_2022 { get; set; }
         public int year_2023 { get; set; }
     }
-
     public class GHG
     {
         public int GHG_ID { get; set; }
@@ -72,7 +71,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2022 { get; set; }
         public float year_2023 { get; set; }
     }
-
     public class PUE
     {
         public int PUE_ID { get; set; }
@@ -86,7 +84,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2022 { get; set; }
         public float year_2023 { get; set; }
     }
-
     public class WASTE
     {
         public int Waste_ID { get; set; }
@@ -99,7 +96,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2022 { get; set; }
         public float year_2023 { get; set; }
     }
-
     public class WATER
     {
         public int Water_ID { get; set; }
@@ -112,7 +108,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2022 { get; set; }
         public float year_2023 { get; set; }
     }
-
     public class WATERBYREGIO
     {
         public int Water_By_Regio_ID { get; set; }
