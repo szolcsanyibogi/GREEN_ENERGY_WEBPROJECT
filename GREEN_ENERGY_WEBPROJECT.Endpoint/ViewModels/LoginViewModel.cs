@@ -10,7 +10,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.ViewModels
 
         [Required(ErrorMessage = "Password is required.")]
         [DataType(DataType.Password)]
-        public string Passport { get; set; }
+        public string Password { get; set; }
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
