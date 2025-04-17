@@ -53,6 +53,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
             {
                 Users users = new Users
                 {
+                    Factory = model.Factory,    
                     FullName = model.Name,
                     Email = model.Email,
                     UserName = model.Email,
