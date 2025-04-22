@@ -1,5 +1,7 @@
-﻿using GREEN_ENERGY_WEBPROJECT.Endpoint.Models;
+﻿using System.Security.Claims;
+using GREEN_ENERGY_WEBPROJECT.Endpoint.Models;
 using GREEN_ENERGY_WEBPROJECT.Endpoint.ViewModels;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -26,10 +28,29 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                var user = await userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Email or password is incorrect.");
+                    return View(model);
+                }
+
+                var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)
                 {
+                    // 🔽 Itt manuálisan új claim-identity-t hozunk létre
+                    var userClaims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.Email),
+                        new Claim("Factory", user.Factory.ToString().ToLower()) // "true" vagy "false"
+                    };
+
+                    var identity = new ClaimsIdentity(userClaims, "Identity.Application");
+                    var principal = new ClaimsPrincipal(identity);
+
+                    await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal);
+
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -40,6 +61,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
             }
             return View(model);
         }
+
 
         public IActionResult Register()
         {
@@ -53,7 +75,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
             {
                 Users users = new Users
                 {
-                    Factory = model.Factory,    
+                    Factory = model.Factory,
                     FullName = model.Name,
                     Email = model.Email,
                     UserName = model.Email,
@@ -63,6 +85,14 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
 
                 if (result.Succeeded)
                 {
+                    // 🔽 Új kód: claim hozzáadása a Factory mező alapján
+                    var claims = new List<Claim>
+                    {
+                        new Claim("Factory", users.Factory.ToString().ToLower()) // "true" vagy "false"
+                    };
+
+                    await userManager.AddClaimsAsync(users, claims);
+
                     return RedirectToAction("Login", "Account");
                 }
                 else
@@ -77,6 +107,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
             }
             return View(model);
         }
+
 
         public IActionResult VerifyEmail()
         {

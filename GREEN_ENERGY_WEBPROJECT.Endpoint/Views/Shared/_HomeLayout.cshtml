@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Webapp</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #819E3A;
+            padding: 10px 20px;
+        }
+
+        .navbar-left, .navbar-right {
+            display: flex;
+            gap: 15px;
+        }
+
+        .navbar a {
+            color: #252D11;
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: background-color 0.3s ease;
+        }
+
+            .navbar a:hover {
+                background-color: #3E4C1C;
+                border-radius: 4px;
+            }
+
+        .home-background {
+            background-image: url('../images/renewable-energy-helsinki-1080x675.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat-y;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .home-content {
+            max-width: 1500px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 10px;
+        }
+
+        .logout-button {
+            background: none;
+            border: none;
+            color: #252D11;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+            .logout-button:hover {
+                background-color: #3E4C1C;
+                border-radius: 4px;
+            }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .username {
+            color: #252D11;
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="/">Home</a>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a href="/Diagrams">Diagrams</a>
+
+                @if (User.HasClaim("Factory", "true"))
+                {
+                    <a href="/Upload">Upload Data</a>
+                }
+
+            }
+
+            <a href="/Home/Privacy">Privacy Policy</a>
+        </div>
+
+        <div class="navbar-right">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <span class="username">Hello, @User.Identity.Name</span>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                    <button type="submit" class="logout-button">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a href="/Account/Login">Login</a>
+                <a href="/Account/Register">Register</a>
+            }
+        </div>
+
+    </div>
+
+    <div class="container">
+        @RenderBody()
+    </div>
+</body>
+</html>

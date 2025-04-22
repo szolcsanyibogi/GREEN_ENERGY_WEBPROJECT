@@ -1,8 +1,33 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-background">
+    <div class="home-content">
+        <p>
+            🌱 <strong style="font-size: large">Green Energy Facts</strong><br><br />
+            1. <strong>Solar energy can already be cheaper than fossil fuels</strong><br /> – in many countries, solar panels produce energy more cost-effectively than traditional sources.<br>
+            2. <strong>A single wind turbine can power up to 1,500 homes</strong><br /> – depending on location and size.<br>
+            3. <strong>Green data centers are becoming more common</strong><br /> – companies like Apple and Google now run data centers powered entirely by renewable energy.
+        </p>
+
+        <p>
+            🗃️ <strong style="font-size: large">Data Warehouses and Energy Usage</strong><br><br />
+            1. <strong>Data warehouses consume a lot of energy due to continuous operation</strong><br /> – storing and querying data generates heat and high workload.<br>
+            2. <strong>Optimized queries = lower energy use</strong><br /> – writing efficient SQL and using proper indexing not only speeds things up, but also reduces power consumption.<br>
+            3. <strong>Accurate data types matter</strong><br /> – using unnecessarily large types (like <code>VARCHAR(255)</code> instead of <code>VARCHAR(50)</code>) requires more memory and energy.
+        </p>
+
+        <p>
+            🖥️ <strong style="font-size: large">Reducing Energy Use in Data Centers</strong><br><br />
+            1. <strong>Heat recovery</strong><br /> – some data centers reuse the heat from servers to warm residential buildings.<br>
+            2. <strong>Immersion cooling</strong><br /> – servers are submerged in special liquids that conduct heat efficiently, reducing the need for traditional air conditioning.<br>
+            3. <strong>AI for energy optimization</strong><br /> – Google's AI systems, for example, can reduce cooling energy needs in real time by up to 40%.
+        </p>
+
+    </div>
 </div>
+
+
+
