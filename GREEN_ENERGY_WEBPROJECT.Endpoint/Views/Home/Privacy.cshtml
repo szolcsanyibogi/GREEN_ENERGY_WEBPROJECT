@@ -1,102 +1,136 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Privacy Policy";
-    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
 }
+
+<style>
+    .privacy-background {
+        background-image: url('../images/renewable-energy-helsinki-1080x675.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        min-height: 100vh;
+        padding: 50px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .privacy-content {
+        background-color: white;
+        padding: 40px;
+        border-radius: 20px;
+        max-width: 1200px;
+        width: 100%;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.8;
+        font-size: 17px;
+        color: #333;
+    }
+
+        .privacy-content h1 {
+            font-size: 28px;
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+
+        .privacy-content b {
+            color: #2e7d32;
+            display: block;
+            margin-top: 25px;
+            font-size: 18px;
+        }
+
+        .privacy-content ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .privacy-content li {
+            margin-bottom: 6px;
+        }
+
+        .privacy-content a {
+            color: #00796b;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+            .privacy-content a:hover {
+                text-decoration: underline;
+            }
+
+    .text-center {
+        text-align: center;
+    }
+</style>
 
 <div class="privacy-background">
     <div class="privacy-content">
         <h1>Privacy Policy</h1>
         <p>Effective Date: 2025. 04. 17.</p>
+
+        <p>This Privacy Policy explains how GREEN ENERGY ("we", "our", or "us") collects, uses, discloses, and safeguards your information when you visit our website [yourwebsite.com] or use our services. Please read this policy carefully to understand our views and practices regarding your personal data and how we will treat it.</p>
+
+        <b>1. Information We Collect</b>
+        <ul>
+            <li>Personal Identification Information (e.g., name, email address, phone number)</li>
+            <li>Technical Data (e.g., IP address, browser type, device information)</li>
+            <li>Usage Data (e.g., pages visited, time spent on the website)</li>
+            <li>Cookies and Tracking Technologies</li>
+        </ul>
+
+        <b>2. How We Use Your Information</b>
+        <ul>
+            <li>To provide, operate, and maintain our website or services</li>
+            <li>To improve user experience and personalize content</li>
+            <li>To communicate with you, including sending updates or promotional materials</li>
+            <li>To comply with legal obligations</li>
+        </ul>
+
+        <b>3. Sharing Your Information</b>
+        <ul>
+            <li>We do not sell or rent your personal data. We may share your information with third parties in the following situations:</li>
+            <li>With service providers who assist us in operating the website or services</li>
+            <li>To comply with legal requirements or respond to lawful requests</li>
+            <li>To protect the rights, property, or safety of us or others</li>
+        </ul>
+
+        <b>4. Data Security</b>
+        <ul>
+            <li>We take reasonable technical and organizational measures to protect your personal data from unauthorized access, loss, misuse, or alteration.</li>
+        </ul>
+
+        <b>5. Your Rights</b>
+        <ul>
+            <li>Access the personal data we hold about you</li>
+            <li>Request correction or deletion of your data</li>
+            <li>Object to or restrict our processing of your data</li>
+            <li>Withdraw your consent at any time</li>
+            <li>To exercise these rights, please contact us at [your contact email].</li>
+        </ul>
+
+        <b>6. Cookies</b>
+        <ul>
+            <li>We use cookies and similar tracking technologies to enhance your browsing experience. You can choose to disable cookies through your browser settings.</li>
+        </ul>
+
+        <b>7. Changes to This Privacy Policy</b>
+        <ul>
+            <li>We reserve the right to update or change this Privacy Policy at any time. Any changes will be posted on this page with an updated "Effective Date."</li>
+        </ul>
+
+        <b>8. Contact Us</b>
         <p>
-
-            This Privacy Policy explains how GREEN ENERGY  ("we", "our", or "us") collects, uses, discloses, and safeguards your information when you visit our website [yourwebsite.com] or use our services. Please read this policy carefully to understand our views and practices regarding your personal data and how we will treat it.
-            <br /><br />
-            <b>1. Information We Collect</b><br />
-            <ul>
-                <li>We may collect and process the following types of personal information:</li>
-
-                <li>Personal Identification Information (e.g., name, email address, phone number)</li>
-
-                <li>Technical Data (e.g., IP address, browser type, device information)</li>
-
-                <li>Usage Data (e.g., pages visited, time spent on the website)</li>
-
-                <li>Cookies and Tracking Technologies</li>
-            </ul>
-            <br />
-    
-            <b>2. How We Use Your Information</b><br />
-            <ul>
-                <li>We use the information we collect for various purposes, including:</li>
-
-                <li>To provide, operate, and maintain our website or services</li>
-
-                <li>To improve user experience and personalize content</li>
-
-                <li>To communicate with you, including sending updates or promotional materials</li>
-
-                <li>To comply with legal obligations</li>
-            </ul>
-            <br />
-
-            <b>3. Sharing Your Information</b><br />
-            <ul>
-                <li>We do not sell or rent your personal data. We may share your information with third parties in the following situations:</li>
-
-                <li>With service providers who assist us in operating the website or services</li>
-
-                <li>To comply with legal requirements or respond to lawful requests</li>
-
-                <li>To protect the rights, property, or safety of us or others</li>
-            </ul>
-            <br />
-
-            <b>4. Data Security</b><br />
-            <ul>
-                <li>We take reasonable technical and organizational measures to protect your personal data from unauthorized access, loss, misuse, or alteration.</li>
-            </ul>
-            <br />
-
-            <b>5. Your Rights</b><br />
-            <ul>
-                <li>Depending on your location, you may have the right to:</li>
-
-                <li>Access the personal data we hold about you</li>
-
-                <li>Request correction or deletion of your data</li>
-
-                <li>Object to or restrict our processing of your data</li>
-
-                <li>Withdraw your consent at any time</li>
-
-                <li>To exercise these rights, please contact us at [your contact email].</li>
-            </ul>
-            <br />
-
-            <b>6. Cookies</b><br />
-            <ul>
-                <li>We use cookies and similar tracking technologies to enhance your browsing experience. You can choose to disable cookies through your browser settings.</li>
-            </ul>
-            <br />
-
-            <b>7. Changes to This Privacy Policy</b><br />
-            <ul>
-                <li>We reserve the right to update or change this Privacy Policy at any time. Any changes will be posted on this page with an updated "Effective Date."</li>
-            </ul>
-            <br />
-
-            <b>8. Contact Us</b><br />
-
             If you have any questions or concerns about this Privacy Policy, please contact us at:<br />
-
             [Your Company Name]<br />
             Email: [your contact email]<br />
-            Website: [yourwebsite.com]<br />
+            Website: [yourwebsite.com]
         </p>
+
         <div class="text-center">
-            <a asp-controller="Home" asp-action="Index" class="text-decoration-none mt-3">Back</a>
+            <a asp-controller="Home" asp-action="Index" class="mt-3">← Back to Home</a>
         </div>
     </div>
 </div>
-
