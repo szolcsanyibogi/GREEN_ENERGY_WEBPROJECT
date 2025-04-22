@@ -1,5 +1,5 @@
 ﻿.account-container {
-    background-image: url('../images/renewable-energy-helsinki-1080x675.jpg');
+    background-image: url('../images/leaf_3.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: repeat-y;
@@ -11,7 +11,7 @@
 }
 
 .account-box {
-    background-color: #F0FFF0;
+    background-color: #c7dbbf;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
