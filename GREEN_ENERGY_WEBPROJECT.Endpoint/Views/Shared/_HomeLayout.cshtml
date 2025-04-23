@@ -97,7 +97,7 @@
 
                 @if (User.HasClaim("Factory", "true"))
                 {
-                    <a href="/Home/Upload_data">Upload Data</a>
+                    <a href="/Upload/Upload_data">Upload Data</a>
                 }
 
             }
@@ -125,5 +125,8 @@
     <div class="container">
         @RenderBody()
     </div>
+
+    @RenderSection("Scripts", required: false)
+
 </body>
 </html>

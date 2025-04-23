@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GREEN_ENERGY_WEBPROJECT.Repository\GREEN_ENERGY_WEBPROJECT.Repository.csproj" />
+  </ItemGroup>
+
 </Project>

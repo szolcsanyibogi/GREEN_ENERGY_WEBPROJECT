@@ -28,10 +28,8 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
             return View();
         }
 
-        public IActionResult Upload_data()
-        {
-            return View();
-        }
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
