@@ -93,11 +93,11 @@
 
             @if (User.Identity.IsAuthenticated)
             {
-                <a href="/Pages/Diagrams">Diagrams</a>
+                <a href="/Home/Diagrams">Diagrams</a>
 
                 @if (User.HasClaim("Factory", "true"))
                 {
-                    <a href="/Pages/Upload_data">Upload Data</a>
+                    <a href="/Home/Upload_data">Upload Data</a>
                 }
 
             }
