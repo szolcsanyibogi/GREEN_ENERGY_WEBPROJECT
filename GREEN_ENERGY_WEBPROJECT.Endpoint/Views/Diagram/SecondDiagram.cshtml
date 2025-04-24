@@ -1,0 +1,123 @@
+﻿@{
+    ViewData["Title"] = "Waste Generation Diagram";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .diag-background {
+        background-image: url('../images/leaf_4.png');
+        min-height: 100vh;
+        padding: 50px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .diag-content {
+        background-color: #c7dbbf;
+        padding: 40px;
+        border-radius: 20px;
+        max-width: 1200px;
+        width: 100%;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 17px;
+        opacity: .95;
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #00796b;
+        margin-bottom: 20px;
+    }
+
+    form {
+        margin-bottom: 30px;
+    }
+
+    select, button {
+        padding: 10px;
+        margin-right: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    button {
+        background-color: #00796b;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+
+<div class="diag-background">
+    <div class="diag-content">
+        <div class="section-title">Waste Generation by Company (2019–2023)</div>
+
+        <form method="get" action="@Url.Action("SecondDiagram", "Diagram")">
+            <label for="factory">Factory:</label>
+            @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+
+            <label for="year">Year:</label>
+            @Html.DropDownList("year", (SelectList)ViewBag.Years, "Select a year", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+
+            <button type="submit">Filter</button>
+        </form>
+
+        <canvas id="wasteChart" width="1000" height="400"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const wasteData = @Html.Raw(ViewBag.WasteDataJson ?? "[]");
+        const colors = ['#4caf50', '#ff9800', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#795548'];
+
+        const wasteGrouped = {};
+        wasteData.forEach(item => {
+            if (!wasteGrouped[item.FactoryName]) wasteGrouped[item.FactoryName] = {};
+            wasteGrouped[item.FactoryName][item.Year] = item.AvgWaste;
+        });
+
+        const years = [...new Set(wasteData.map(p => p.Year))].sort();
+        const companies = Object.keys(wasteGrouped);
+
+        const wasteDatasets = companies.map((company, i) => ({
+            label: company,
+            data: years.map(y => wasteGrouped[company][y] ?? null),
+            backgroundColor: colors[i % colors.length]
+        }));
+
+        new Chart(document.getElementById('wasteChart'), {
+            type: 'bar',
+            data: {
+                labels: years,
+                datasets: wasteDatasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { enabled: true },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: val => val?.toFixed(2) + ' t'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Waste (tons)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Year' }
+                    }
+                }
+            }
+        });
+    </script>
+}

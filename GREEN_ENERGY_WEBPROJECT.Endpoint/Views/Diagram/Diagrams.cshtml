@@ -4,7 +4,7 @@
 }
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-geo@4.1.1/build/index.umd.min.js"></script>
 
 <style>
     .diag-background {
@@ -35,95 +35,76 @@
         margin-bottom: 20px;
     }
 
-    .form-group {
-        margin-bottom: 20px;
+    form {
+        margin-bottom: 30px;
     }
 
-    label {
-        font-weight: bold;
-        display: inline-block;
-        margin-bottom: 5px;
-    }
-
-    select {
-        padding: 8px;
+    select, button {
+        padding: 10px;
+        margin-right: 10px;
         border-radius: 6px;
         border: 1px solid #ccc;
-        margin-right: 10px;
-        min-width: 200px;
+        font-size: 16px;
     }
 
-    .submit-button {
+    button {
         background-color: #00796b;
         color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 6px;
         cursor: pointer;
-    }
-
-    canvas {
-        margin-top: 30px;
     }
 </style>
 
 <div class="diag-background">
     <div class="diag-content">
-        <div class="section-title">PUE Averages per Company (2019–2023)</div>
+        <div class="section-title">Sustainability Diagrams (2019–2023)</div>
 
         <form method="get" action="@Url.Action("Diagrams", "Diagram")">
-            <div class="form-group">
-                <label for="factory">Factory:</label>
-                @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @id = "factory", @class = "form-control" })
+            <label for="factory">Factory:</label>
+            @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
 
-                <label for="year">Year:</label>
-                @Html.DropDownList("year", (SelectList)ViewBag.Years, "Select a year", new { @id = "year", @class = "form-control" })
+            <label for="year">Year:</label>
+            @Html.DropDownList("year", (SelectList)ViewBag.Years, "Select a year", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
 
-                <button type="submit" class="submit-button">Filter</button>
-            </div>
+            <button type="submit">Filter</button>
         </form>
 
+        <h3>PUE Averages per Company</h3>
         <canvas id="pueChart" width="1000" height="400"></canvas>
+
+        <h3 style="margin-top: 60px;">Waste Generated per Company</h3>
+        <canvas id="wasteChart" width="1000" height="400"></canvas>
+
+        <h3 style="margin-top: 60px;">Water Withdrawal by Region</h3>
+        <canvas id="waterMap" width="1000" height="600"></canvas>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        const pueData = @Html.Raw(ViewBag.PUEDataJson);
-        const grouped = {};
+        const colors = ['#4caf50', '#ff9800', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#795548'];
 
-        // Group by company name and year
+        // --- PUE Chart ---
+        const pueData = @Html.Raw(ViewBag.PUEDataJson ?? "[]");
+        const pueGrouped = {};
         pueData.forEach(item => {
-            if (!grouped[item.FactoryName]) grouped[item.FactoryName] = {};
-            grouped[item.FactoryName][item.Year] = item.AvgPUE;
+            if (!pueGrouped[item.FactoryName]) pueGrouped[item.FactoryName] = {};
+            pueGrouped[item.FactoryName][item.Year] = item.AvgPUE;
         });
-
         const years = [...new Set(pueData.map(p => p.Year))].sort();
-        const companies = Object.keys(grouped);
-        const colors = ['#4caf50', '#ff9800', '#2196f3', '#9c27b0', '#f44336'];
-
-        const datasets = companies.map((company, i) => ({
+        const companies = Object.keys(pueGrouped);
+        const pueDatasets = companies.map((company, i) => ({
             label: company,
-            data: years.map(y => grouped[company][y] ?? null),
+            data: years.map(y => pueGrouped[company][y] ?? null),
             backgroundColor: colors[i % colors.length]
         }));
-
         new Chart(document.getElementById('pueChart'), {
             type: 'bar',
-            data: {
-                labels: years,
-                datasets: datasets
-            },
+            data: { labels: years, datasets: pueDatasets },
             options: {
                 responsive: true,
                 plugins: {
                     legend: { position: 'top' },
-                    tooltip: { enabled: true },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        formatter: val => val?.toFixed(2)
-                    }
+                    tooltip: { enabled: true }
                 },
                 scales: {
                     y: {
@@ -132,12 +113,75 @@
                         max: 1.6,
                         title: { display: true, text: 'PUE Value' }
                     },
-                    x: {
-                        title: { display: true, text: 'Year' }
+                    x: { title: { display: true, text: 'Year' } }
+                }
+            }
+        });
+
+        // --- Waste Chart ---
+        const wasteData = @Html.Raw(ViewBag.WasteDataJson ?? "[]");
+        const wasteGrouped = {};
+        wasteData.forEach(item => {
+            if (!wasteGrouped[item.FactoryName]) wasteGrouped[item.FactoryName] = {};
+            wasteGrouped[item.FactoryName][item.Year] = item.AvgWaste;
+        });
+        const wasteYears = [...new Set(wasteData.map(p => p.Year))].sort();
+        const wasteCompanies = Object.keys(wasteGrouped);
+        const wasteDatasets = wasteCompanies.map((company, i) => ({
+            label: company,
+            data: wasteYears.map(y => wasteGrouped[company][y] ?? null),
+            backgroundColor: colors[i % colors.length]
+        }));
+        new Chart(document.getElementById('wasteChart'), {
+            type: 'bar',
+            data: { labels: wasteYears, datasets: wasteDatasets },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Waste (tons)' }
+                    },
+                    x: { title: { display: true, text: 'Year' } }
+                }
+            }
+        });
+
+        // --- Water Map ---
+        const waterData = @Html.Raw(ViewBag.WaterMapDataJson ?? "[]");
+
+        fetch('https://unpkg.com/world-atlas/countries-110m.json').then(res => res.json()).then(worldData => {
+            const countries = ChartGeo.topojson.feature(worldData, worldData.objects.countries).features;
+            const ctx = document.getElementById('waterMap').getContext('2d');
+            new Chart(ctx, {
+                type: 'choropleth',
+                data: {
+                    labels: countries.map(d => d.properties.name),
+                    datasets: [{
+                        label: 'Water Withdrawal',
+                        data: waterData,
+                        outline: ChartGeo.topojson.mesh(worldData, worldData.objects.countries, (a, b) => a !== b)
+                    }]
+                },
+                options: {
+                    showOutline: true,
+                    showGraticule: true,
+                    scales: {
+                        xy: { projection: 'equalEarth' },
+                        color: {
+                            quantize: 5,
+                            legend: { position: 'right' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
                     }
                 }
-            },
-            plugins: [ChartDataLabels]
+            });
         });
     </script>
 }

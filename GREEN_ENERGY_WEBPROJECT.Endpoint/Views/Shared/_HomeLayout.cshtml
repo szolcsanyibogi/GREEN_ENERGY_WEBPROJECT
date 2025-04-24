@@ -83,6 +83,47 @@
             font-size: 1rem;
         }
 
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            cursor: pointer;
+            color: #181c17;
+            text-decoration: none;
+            padding: 8px 12px;
+        }
+
+            .dropdown-toggle:hover {
+                background-color: #374234;
+                border-radius: 4px;
+            }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 220px;
+            z-index: 1;
+            border-radius: 5px;
+        }
+
+            .dropdown-content a {
+                color: black;
+                padding: 10px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+                .dropdown-content a:hover {
+                    background-color: #ddd;
+                }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
 
     </style>
 </head>
@@ -93,17 +134,24 @@
 
             @if (User.Identity.IsAuthenticated)
             {
-                <a href="/Diagram/Diagrams">Diagrams</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle">Diagrams</a>
+                    <div class="dropdown-content">
+                        <a href="/Diagram/FirstDiagram">PUE Averages</a>
+                        <a href="/Diagram/SecondDiagram">Waste Generation</a>
+                        <a href="/Diagram/ThirdDiagram">Water Usage by Region</a>
+                    </div>
+                </div>
 
                 @if (User.HasClaim("Factory", "true"))
                 {
                     <a href="/Upload/Upload_data">Upload Data</a>
                 }
-
             }
 
             <a href="/Home/Privacy">Privacy Policy</a>
         </div>
+
 
         <div class="navbar-right">
             @if (User.Identity.IsAuthenticated)

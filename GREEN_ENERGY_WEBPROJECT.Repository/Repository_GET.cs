@@ -569,6 +569,67 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             return factories;
         }
 
+        public UNIT GetWasteUnit()
+        {
+            string query = "SELECT Unit_ID, Unit_Name FROM DIM_UNIT WHERE Unit_Name = 'Waste'";
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (!reader.Read()) return null;
+                return new UNIT
+                {
+                    UNIT_ID = reader.GetInt32(0),
+                    UNIT_NAME = reader.GetString(1)
+                };
+            }
+        }
+
+        public List<FACT> GetAllFacts()
+        {
+            string query = "SELECT VALUE, FACTORY_ID, DATE_ID, METRIC_ID, UNIT_ID FROM FACT_TABLE";
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            List<FACT> facts = new List<FACT>();
+
+            if (con.State != ConnectionState.Open) con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                var fact = new FACT()
+                {
+                    VALUE = reader.IsDBNull(0) ? 0f : Convert.ToSingle(reader.GetDouble(0)),
+                    FACTORY_ID = reader.IsDBNull(1) ? -1 : reader.GetInt32(1),
+                    DATE_ID = reader.IsDBNull(2) ? -1 : reader.GetInt32(2),
+                    METRIC_ID = reader.IsDBNull(3) ? -1 : reader.GetInt32(3),
+                    UNIT_ID = reader.IsDBNull(4) ? -1 : reader.GetInt32(4)
+                };
+
+                facts.Add(fact);
+            }
+
+            reader.Close();
+
+            // Töltés kapcsolódó entitásokkal, ha az ID érvényes
+            foreach (var fact in facts)
+            {
+                if (fact.FACTORY_ID > 0)
+                    fact.FACTORY = GetFACTORY(fact.FACTORY_ID);
+
+                if (fact.DATE_ID > 0)
+                    fact.DATE = GetDATE(fact.DATE_ID);
+
+                if (fact.METRIC_ID > 0)
+                    fact.METRIC = GetMETRIC(fact.METRIC_ID);
+
+                if (fact.UNIT_ID > 0)
+                    fact.UNIT = GetUNIT(fact.UNIT_ID);
+            }
+
+            return facts;
+        }
+
     }
 
 }
