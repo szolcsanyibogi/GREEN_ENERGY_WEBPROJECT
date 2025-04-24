@@ -1,0 +1,143 @@
+﻿@{
+    ViewData["Title"] = "Diagrams";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<style>
+    .diag-background {
+        background-image: url('../images/leaf_4.png');
+        min-height: 100vh;
+        padding: 50px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .diag-content {
+        background-color: #c7dbbf;
+        padding: 40px;
+        border-radius: 20px;
+        max-width: 1200px;
+        width: 100%;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 17px;
+        opacity: .95;
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #00796b;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 5px;
+    }
+
+    select {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+        min-width: 200px;
+    }
+
+    .submit-button {
+        background-color: #00796b;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    canvas {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="diag-background">
+    <div class="diag-content">
+        <div class="section-title">PUE Averages per Company (2019–2023)</div>
+
+        <form method="get" action="@Url.Action("Diagrams", "Diagram")">
+            <div class="form-group">
+                <label for="factory">Factory:</label>
+                @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @id = "factory", @class = "form-control" })
+
+                <label for="year">Year:</label>
+                @Html.DropDownList("year", (SelectList)ViewBag.Years, "Select a year", new { @id = "year", @class = "form-control" })
+
+                <button type="submit" class="submit-button">Filter</button>
+            </div>
+        </form>
+
+        <canvas id="pueChart" width="1000" height="400"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const pueData = @Html.Raw(ViewBag.PUEDataJson);
+        const grouped = {};
+
+        // Group by company name and year
+        pueData.forEach(item => {
+            if (!grouped[item.FactoryName]) grouped[item.FactoryName] = {};
+            grouped[item.FactoryName][item.Year] = item.AvgPUE;
+        });
+
+        const years = [...new Set(pueData.map(p => p.Year))].sort();
+        const companies = Object.keys(grouped);
+        const colors = ['#4caf50', '#ff9800', '#2196f3', '#9c27b0', '#f44336'];
+
+        const datasets = companies.map((company, i) => ({
+            label: company,
+            data: years.map(y => grouped[company][y] ?? null),
+            backgroundColor: colors[i % colors.length]
+        }));
+
+        new Chart(document.getElementById('pueChart'), {
+            type: 'bar',
+            data: {
+                labels: years,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { enabled: true },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: val => val?.toFixed(2)
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        min: 0.9,
+                        max: 1.6,
+                        title: { display: true, text: 'PUE Value' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Year' }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    </script>
+}

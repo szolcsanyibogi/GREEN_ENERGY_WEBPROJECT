@@ -9,12 +9,12 @@ using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Data;
 
-namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
+namespace GREEN_ENERGY_WEBPROJECT.Repository
 {
-    public class Repository
+    public class Repository_GET
     {
         SqlConnection con;
-        public Repository(string ConnectionString)
+        public Repository_GET(string ConnectionString)
         {
             con = new SqlConnection(ConnectionString);
             con.Open();
@@ -75,16 +75,15 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
             if (con.State != ConnectionState.Open) con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
 
-            // 1. Beolvasás memóriába
             while (reader.Read())
             {
                 var fact = new FACT()
                 {
-                    VALUE = reader.IsDBNull(0) ? 0f : (float)reader.GetDouble(0),
-                    FACTORY_ID = reader.GetInt32(1),
-                    DATE_ID = reader.GetInt32(2),
-                    METRIC_ID = reader.GetInt32(3),
-                    UNIT_ID = reader.GetInt32(4),
+                    VALUE = reader.IsDBNull(0) ? 0f : Convert.ToSingle(reader.GetDouble(0)),
+                    FACTORY_ID = reader.IsDBNull(1) ? -1 : reader.GetInt32(1),
+                    DATE_ID = reader.IsDBNull(2) ? -1 : reader.GetInt32(2),
+                    METRIC_ID = reader.IsDBNull(3) ? -1 : reader.GetInt32(3),
+                    UNIT_ID = reader.IsDBNull(4) ? -1 : reader.GetInt32(4)
                 };
 
                 facts.Add(fact);
@@ -92,17 +91,25 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
 
             reader.Close();
 
-            // 2. Kapcsolódó adatok betöltése csak a reader bezárása után
+            // Töltés kapcsolódó entitásokkal, csak ha az ID érvényes
             foreach (var fact in facts)
             {
-                fact.FACTORY = GetFACTORY(fact.FACTORY_ID);
-                fact.DATE = GetDATE(fact.DATE_ID);
-                fact.METRIC = GetMETRIC(fact.METRIC_ID);
-                fact.UNIT = GetUNIT(fact.UNIT_ID);
+                if (fact.FACTORY_ID > 0)
+                    fact.FACTORY = GetFACTORY(fact.FACTORY_ID);
+
+                if (fact.DATE_ID > 0)
+                    fact.DATE = GetDATE(fact.DATE_ID);
+
+                if (fact.METRIC_ID > 0)
+                    fact.METRIC = GetMETRIC(fact.METRIC_ID);
+
+                if (fact.UNIT_ID > 0)
+                    fact.UNIT = GetUNIT(fact.UNIT_ID);
             }
 
             return facts;
         }
+
 
         public List<FACT> GetFACTS_BY_METRICID(int ID)
         {
@@ -230,6 +237,9 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
             SqlCommand cmd = new SqlCommand(query, con);
             cmd.Parameters.AddWithValue("@ID", ID);
 
+            if (con.State != ConnectionState.Open)
+                con.Open();
+
             using (SqlDataReader reader = cmd.ExecuteReader())
             {
                 if (!reader.Read()) return null;
@@ -237,13 +247,14 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
                 return new FACTORY()
                 {
                     FACTORY_ID = reader.GetInt32(0),
-                    FACTORY_NAME = reader.GetString(1),
-                    COUNTRY = reader.GetString(2),
-                    LOCATION = reader.GetString(3),
-                    REGIO = reader.GetString(4)
+                    FACTORY_NAME = reader.IsDBNull(1) ? "" : reader.GetString(1),
+                    COUNTRY = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                    LOCATION = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                    REGIO = reader.IsDBNull(4) ? "" : reader.GetString(4)
                 };
             }
         }
+
 
         public List<FACTORY> GetFACTORY_NAME(string FACTORY_NAME)
         {
@@ -445,5 +456,119 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
                 };
             }
         }
+
+        public List<FACTORY> GetFactories()
+        {
+            var factories = new List<FACTORY>();
+            string query = "SELECT DISTINCT FACTORY_NAME FROM DIM_FACTORY";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                int tempId = 1; // ideiglenes ID, mivel FACTORY_ID nem lesz benne a lekérdezésben
+                while (reader.Read())
+                {
+                    factories.Add(new FACTORY
+                    {
+                        FACTORY_ID = tempId++, // vagy null/0 ha nem használnád a ViewBag-ben
+                        FACTORY_NAME = reader.GetString(0)
+                    });
+                }
+            }
+
+            return factories;
+        }
+
+
+        public List<DATE> GetYears()
+        {
+            var years = new List<DATE>();
+            string query = "SELECT DISTINCT YEAR FROM DIM_DATE ORDER BY YEAR";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    years.Add(new DATE
+                    {
+                        YEAR = reader.GetInt32(0)
+                    });
+                }
+            }
+
+            return years;
+        }
+
+        public List<FACTORY> GetAllFactories()
+        {
+            string query = "SELECT FACTORY_ID, FACTORY_NAME, COUNTRY, LOCATION, REGIO FROM DIM_FACTORY";
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            List<FACTORY> factories = new List<FACTORY>();
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    factories.Add(new FACTORY
+                    {
+                        FACTORY_ID = reader.GetInt32(0),
+                        FACTORY_NAME = reader.IsDBNull(1) ? "" : reader.GetString(1),
+                        COUNTRY = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                        LOCATION = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                        REGIO = reader.IsDBNull(4) ? "" : reader.GetString(4)
+                    });
+                }
+            }
+            return factories;
+        }
+
+
+        public List<DATE> GetAllDates()
+        {
+            string query = "SELECT DATE_ID, YEAR FROM DIM_DATE";
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            List<DATE> dates = new List<DATE>();
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    dates.Add(new DATE
+                    {
+                        DATE_ID = reader.GetInt32(0),
+                        YEAR = reader.IsDBNull(1) ? 0 : reader.GetInt32(1)
+                    });
+                }
+            }
+            return dates;
+        }
+
+        public List<FACTORY> GetDistinctFactoryNames()
+        {
+            string query = @"
+        SELECT MIN(FACTORY_ID) AS FACTORY_ID, FACTORY_NAME
+        FROM DIM_FACTORY
+        GROUP BY FACTORY_NAME";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            List<FACTORY> factories = new List<FACTORY>();
+            using (SqlDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    factories.Add(new FACTORY
+                    {
+                        FACTORY_ID = reader.GetInt32(0),
+                        FACTORY_NAME = reader.GetString(1)
+                    });
+                }
+            }
+
+            return factories;
+        }
+
     }
+
 }

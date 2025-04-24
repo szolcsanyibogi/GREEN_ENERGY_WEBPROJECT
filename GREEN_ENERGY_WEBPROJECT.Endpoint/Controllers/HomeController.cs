@@ -23,10 +23,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
             return View();
         }
 
-        public IActionResult Diagrams()
-        {
-            return View();
-        }
+        
 
 
 
