@@ -117,11 +117,11 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
                         throw new Exception("Ismeretlen tábla: " + SelectedTable);
                 }
 
-                TempData["Message"] = "✅ Sikeres feltöltés!";
+                TempData["Message"] = "✅ Upload successful!";
             }
             catch (Exception ex)
             {
-                TempData["Message"] = $"❌ Hiba történt: {ex.Message}";
+                TempData["Message"] = $"❌ An error occurred: {ex.Message}";
             }
 
             return RedirectToAction("Upload_data");

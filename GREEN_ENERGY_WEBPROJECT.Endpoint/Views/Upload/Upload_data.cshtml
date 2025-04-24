@@ -79,36 +79,37 @@
     }
 
     .alert-message {
-        background-color: #dff0d8; /* zöldes háttér a sikerhez */
+        position: fixed;
+        top: 150px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #dff0d8;
         color: #3c763d;
         border: 1px solid #d6e9c6;
-        padding: 15px;
+        padding: 15px 25px;
         border-radius: 10px;
-        margin-bottom: 20px;
-        text-align: center;
         font-weight: bold;
-        transition: opacity 0.5s ease-out;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 1s ease-out;
     }
 
         .alert-message.fade-out {
             opacity: 0;
         }
 
+
 </style>
+
+
 
 @if (TempData["Message"] != null)
 {
-    <div style="padding:10px; background-color: #e0f7fa; border-radius: 6px; margin-bottom: 20px;">
+    <div id="uploadMessage" class="alert-message">
         @TempData["Message"]
     </div>
 }
 
-@if (ViewBag.Message != null)
-{
-    <div id="uploadMessage" class="alert-message">
-        @ViewBag.Message
-    </div>
-}
 
 
 <div class="upload-background">
@@ -146,6 +147,16 @@
 
 @section Scripts {
     <script>
+        window.onload = function () {
+            const msg = document.getElementById("uploadMessage");
+            if (msg) {
+                setTimeout(() => {
+                    msg.classList.add("fade-out");
+                    setTimeout(() => msg.remove(), 1000); // teljes törlés 1 másodperc után
+                }, 4000); // 4 másodperc után indul az eltűnés
+            }
+        };
+
         function loadFormFields() {
             const selectedTable = document.getElementById("tableSelector").value;
             const formFields = document.getElementById("formFields");
@@ -194,16 +205,6 @@
             tableField.name = "SelectedTable";
             tableField.value = selectedTable;
             formFields.appendChild(tableField);
-
-            window.onload = function () {
-                const msg = document.getElementById("uploadMessage");
-                if (msg) {
-                    setTimeout(() => {
-                        msg.classList.add("fade-out");
-                        setTimeout(() => msg.remove(), 1000); // teljes törlés 1 másodperc után
-                    }, 4000); // 4 másodperc után indul az eltűnés
-                }
-            }
 
         }
     </script>
