@@ -630,6 +630,31 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             return facts;
         }
 
+        public List<METRIC> GetDIM_METRIC()
+        {
+            var metrics = new List<METRIC>();
+
+            string query = "SELECT [Metric_ID], [Metric_Name] FROM [ATH_STAR_GREEN].[dbo].[dim_Metric]";
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            if (con.State != ConnectionState.Open) con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                metrics.Add(new METRIC
+                {
+                    METRIC_ID = reader.GetInt32(0),
+                    METRIC_NAME = reader.GetString(1)
+                });
+            }
+
+            reader.Close();
+            return metrics;
+        }
+
+
+
     }
 
 }

@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Energy Consumption Trends";
+    Layout = "~/Views/Shared/_HomeLayout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .diag-background {
+        background-image: url('../images/leaf_4.png');
+        min-height: 100vh;
+        padding: 50px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .diag-content {
+        background-color: #c7dbbf;
+        padding: 40px;
+        border-radius: 20px;
+        max-width: 1200px;
+        width: 100%;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 17px;
+        opacity: .95;
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: #00796b;
+        margin-bottom: 20px;
+    }
+
+    .filter-form {
+        margin-bottom: 30px;
+    }
+
+        .filter-form select,
+        .filter-form button {
+            margin-right: 10px;
+            padding: 6px 12px;
+            font-size: 16px;
+        }
+
+        .filter-form button {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+</style>
+
+<div class="diag-background">
+    <div class="diag-content">
+        <div class="section-title">Energy Consumption by Source and Company (2019–2023)</div>
+
+        <form asp-controller="Diagram" asp-action="FourthDiagram" method="get" class="filter-form">
+            @Html.DropDownList("factoryId", ViewBag.Factories as SelectList, "All Companies", new { @class = "form-control" })
+            @Html.DropDownList("source", ViewBag.Sources as SelectList, "All Source", new { @class = "form-control", required = "required" })
+            <button type="submit">Update</button>
+        </form>
+
+        <canvas id="energyChart" width="1000" height="500"></canvas>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const energyData = @Html.Raw(ViewBag.EnergyDataJson ?? "[]");
+
+        const years = [2019, 2020, 2021, 2022, 2023];
+        const factories = [...new Set(energyData.map(d => d.Factory))];
+        const sources = [...new Set(energyData.map(d => d.Source))];
+
+        const sourceColorMap = {
+            "Fuel": "#e57373",
+            "Electricity": "#64b5f6",
+            "Hot water": "#81c784",
+            "Steam": "#ffb74d",
+            "Cooling": "#4dd0e1",
+            "On-site renewable electricity": "#aed581",
+            "Total energy consumption": "#ba68c8",
+            "Total electricity consumption": "#90a4ae"
+        };
+
+        const datasets = [];
+
+        if (sources.length > 1) {
+            factories.forEach(factory => {
+                sources.forEach(source => {
+                    datasets.push({
+                        label: `${factory} - ${source}`,
+                        data: years.map(year => {
+                            const match = energyData.find(d => d.Factory === factory && d.Source === source && d.Year === year);
+                            return match ? match.Value : 0;
+                        }),
+                        stack: factory,
+                        borderWidth: 1,
+                        backgroundColor: sourceColorMap[source] || '#ccc'
+                    });
+                });
+            });
+        } else {
+            const source = sources[0];
+            factories.forEach(factory => {
+                datasets.push({
+                    label: factory,
+                    data: years.map(year => {
+                        const match = energyData.find(d => d.Factory === factory && d.Year === year);
+                        return match ? match.Value : 0;
+                    }),
+                    borderWidth: 1,
+                    backgroundColor: sourceColorMap[source] || '#ccc'
+                });
+            });
+        }
+
+        const ctx = document.getElementById('energyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: years,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Energy Consumption by Source and Company'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: sources.length > 1
+                    },
+                    y: {
+                        stacked: sources.length > 1,
+                        title: {
+                            display: true,
+                            text: 'Energy Usage (MWh)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
+    }
+  ]
+}
