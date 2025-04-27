@@ -653,6 +653,111 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             return metrics;
         }
 
+        public List<UNIT> GetDIM_UNIT()
+        {
+            var units = new List<UNIT>();
+
+            string query = "SELECT [UNIT_ID], [UNIT_Name] FROM [ATH_STAR_GREEN].[dbo].[dim_UNIT]";
+            SqlCommand cmd = new SqlCommand(query, con);
+
+            if (con.State != ConnectionState.Open) con.Open();
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                units.Add(new UNIT
+                {
+                    UNIT_ID = reader.GetInt32(0),
+                    UNIT_NAME = reader.GetString(1)
+                });
+            }
+
+            reader.Close();
+            return units;
+        }
+
+        public List<DATE> GetDIM_DATE()
+        {
+            var dates = new List<DATE>();
+
+            if (con.State != ConnectionState.Open) con.Open();
+
+            string query = "SELECT DATE_ID, YEAR FROM DIM_DATE";
+            SqlCommand cmd = new SqlCommand(query, con);
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                dates.Add(new DATE
+                {
+                    DATE_ID = reader.GetInt32(0),
+                    YEAR = reader.IsDBNull(1) ? 0 : reader.GetInt32(1)
+                });
+            }
+
+            reader.Close();
+            return dates;
+        }
+
+
+
+
+        public List<WaterDataByRegion> GetWaterDataByRegion()
+        {
+            var facts = GetAllFacts();
+            var factories = GetAllFactories();
+            var metrics = GetDIM_METRIC();
+            var units = GetDIM_UNIT();
+            var dates = GetDIM_DATE();
+
+            var waterCategories = new List<string> { "Water withdrawal", "Water consumption", "Water discharges" };
+
+            var data = (from fact in facts
+                        join factory in factories on fact.FACTORY_ID equals factory.FACTORY_ID
+                        join metric in metrics on fact.METRIC_ID equals metric.METRIC_ID
+                        join unit in units on fact.UNIT_ID equals unit.UNIT_ID
+                        join date in dates on fact.DATE_ID equals date.DATE_ID
+                        where waterCategories.Contains(metric.METRIC_NAME)
+                        select new
+                        {
+                            factory.REGIO,
+                            factory.FACTORY_NAME,
+                            unit.UNIT_NAME,
+                            metric.METRIC_NAME,
+                            date.YEAR,
+                            fact.VALUE
+                        }).ToList();
+
+            var grouped = data
+                .GroupBy(d => new { d.REGIO, d.FACTORY_NAME, d.UNIT_NAME, d.METRIC_NAME })
+                .Select(g => new WaterDataByRegion
+                {
+                    Regio = g.Key.REGIO,
+                    Factory = g.Key.FACTORY_NAME,
+                    Unit = g.Key.UNIT_NAME,
+                    Category = g.Key.METRIC_NAME,
+                    Year2019 = g.FirstOrDefault(x => x.YEAR == 2019)?.VALUE,
+                    Year2020 = g.FirstOrDefault(x => x.YEAR == 2020)?.VALUE,
+                    Year2021 = g.FirstOrDefault(x => x.YEAR == 2021)?.VALUE,
+                    Year2022 = g.FirstOrDefault(x => x.YEAR == 2022)?.VALUE,
+                    Year2023 = g.FirstOrDefault(x => x.YEAR == 2023)?.VALUE
+                }).ToList();
+
+            return grouped;
+        }
+
+        public class WaterDataByRegion
+        {
+            public string Regio { get; set; }
+            public string Factory { get; set; }
+            public string Unit { get; set; }
+            public string Category { get; set; }
+            public double? Year2019 { get; set; }
+            public double? Year2020 { get; set; }
+            public double? Year2021 { get; set; }
+            public double? Year2022 { get; set; }
+            public double? Year2023 { get; set; }
+        }
 
 
     }

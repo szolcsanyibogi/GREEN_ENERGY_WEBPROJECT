@@ -122,4 +122,49 @@ namespace GREEN_ENERGY_WEBPROJECT.Models
         public float year_2023 { get; set; }
         public int Water_ID { get; set; }
     }
+    
+    public class HomeContent
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public string Content { get; set; }
+    }
+    public class FirstDiagramContent
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Description { get; set; }
+    }
+    public class SecondDiagramContent
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Description { get; set; }
+    }
+    public class ThirdDiagramContent
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Description { get; set; }
+    }
+    public class FourthDiagramContent
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Description { get; set; }
+    }
+    public class FifthDiagramContent
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Description { get; set; }
+    }
+    public class SixthDiagramContent
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Description { get; set; }
+    }
+
 }

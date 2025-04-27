@@ -93,6 +93,7 @@
             color: #181c17;
             text-decoration: none;
             padding: 8px 12px;
+            display: inline-block;
         }
 
             .dropdown-toggle:hover {
@@ -135,20 +136,27 @@
             @if (User.Identity.IsAuthenticated)
             {
                 <div class="dropdown">
-                    <a href="#" class="dropdown-toggle">Diagrams</a>
+                    <span class="dropdown-toggle">Diagrams</span>
                     <div class="dropdown-content">
                         <a href="/Diagram/FirstDiagram">PUE Averages</a>
                         <a href="/Diagram/SecondDiagram">Waste Generation</a>
                         <a href="/Diagram/ThirdDiagram">Water Usage by Region</a>
                         <a href="/Diagram/FourthDiagram">Energy Consumption Trends</a>
-                        
+                        <a href="/Diagram/FifthDiagram">Carbon Free Energy Map</a>
+                        <a href="/Diagram/SixthDiagram">Greenhouse Gas Intensity Diagram</a>
                     </div>
                 </div>
+
 
                 @if (User.HasClaim("Factory", "true"))
                 {
                     <a href="/Upload/Upload_data">Upload Data</a>
                 }
+                @if (User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com")
+                {
+                    <a href="/Admin/UserManagement">Admin Panel</a>
+                }
+
             }
 
             <a href="/Home/Privacy">Privacy Policy</a>

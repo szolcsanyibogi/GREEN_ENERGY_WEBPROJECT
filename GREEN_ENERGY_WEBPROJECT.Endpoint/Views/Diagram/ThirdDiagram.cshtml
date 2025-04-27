@@ -1,11 +1,28 @@
-﻿@{
-    ViewData["Title"] = "Water Usage Map";
+﻿@model List<GREEN_ENERGY_WEBPROJECT.Repository.Repository_GET.WaterDataByRegion>
+
+@{
+    ViewData["Title"] = "Water Data by Region";
     Layout = "~/Views/Shared/_HomeLayout.cshtml";
+    var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com";
 }
 
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
 <style>
+    .save-button {
+        background-color: #00796b;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease;
+    }
+
+        .save-button:hover {
+            background-color: #005b50;
+        }
+
     .diag-background {
         background-image: url('../images/leaf_4.png');
         min-height: 100vh;
@@ -34,90 +51,87 @@
         margin-bottom: 20px;
     }
 
-    .filter-form {
+    form {
         margin-bottom: 30px;
     }
 
-        .filter-form select,
-        .filter-form button {
-            margin-right: 10px;
-            padding: 6px 12px;
-            font-size: 16px;
-        }
+    select, button {
+        padding: 10px;
+        margin-right: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
 
-        .filter-form button {
-            background-color: #00796b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
+    button {
+        background-color: #00796b;
+        color: white;
+        cursor: pointer;
+    }
 </style>
 
 <div class="diag-background">
     <div class="diag-content">
-        <div class="section-title">Water Withdrawal by Region (Filtered)</div>
+        <div class="section-title">Water Usage Data by Region (2019–2023)</div>
 
-        <form asp-controller="Diagram" asp-action="ThirdDiagram" method="get" class="filter-form">
-            @Html.DropDownList("factoryId", ViewBag.Factories as SelectList, "Select Factory", new { @class = "form-control", required = "required" })
-            @Html.DropDownList("year", ViewBag.Years as SelectList, "Select Year", new { @class = "form-control", required = "required" })
-            @Html.DropDownList("category", ViewBag.Categories as SelectList, "Select Category", new { @class = "form-control", required = "required" })
-            <button type="submit">Update</button>
+        <form method="get" action="@Url.Action("ThirdDiagram", "Diagram")">
+            <label for="factory">Factory:</label>
+            @Html.DropDownList("factory", ViewBag.Factories as SelectList, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+
+            <label for="regio">Regio:</label>
+            @Html.DropDownList("regio", ViewBag.Regios as SelectList, "Select a region", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+
+            <label for="category">Category:</label>
+            @Html.DropDownList("category", ViewBag.Categories as SelectList, "Select a category", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+
+            <button type="submit">Filter</button>
         </form>
 
-        <div id="waterMapChart" style="width: 100%; height: 600px;"></div>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Regio</th>
+                    <th>Factory</th>
+                    <th>Unit</th>
+                    <th>Category</th>
+                    <th>2019</th>
+                    <th>2020</th>
+                    <th>2021</th>
+                    <th>2022</th>
+                    <th>2023</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Regio</td>
+                        <td>@item.Factory</td>
+                        <td>@item.Unit</td>
+                        <td>@item.Category</td>
+                        <td>@(item.Year2019.HasValue ? item.Year2019.Value.ToString("F2") : "N/A")</td>
+                        <td>@(item.Year2020.HasValue ? item.Year2020.Value.ToString("F2") : "N/A")</td>
+                        <td>@(item.Year2021.HasValue ? item.Year2021.Value.ToString("F2") : "N/A")</td>
+                        <td>@(item.Year2022.HasValue ? item.Year2022.Value.ToString("F2") : "N/A")</td>
+                        <td>@(item.Year2023.HasValue ? item.Year2023.Value.ToString("F2") : "N/A")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (isAdmin)
+        {
+            <form asp-action="SaveThirdDiagramDescription" method="post">
+                <textarea name="description" style="width:100%; height:200px; padding:10px; font-size:1rem;">@ViewBag.ThirdDiagramDescription</textarea>
+                <br /><br />
+                <button type="submit" class="save-button">Save</button>
+            </form>
+        }
+        else
+        {
+            <p style="text-align: center; font-weight: bold;">
+                @Html.Raw(ViewBag.ThirdDiagramDescription)
+            </p>
+        }
     </div>
 </div>
-
-@section Scripts {
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script>
-        const waterData = @Html.Raw(ViewBag.WaterMapDataJson ?? "[]");
-
-        const regionMap = {
-            "Asia": ["CHN", "IND", "JPN", "KOR"],
-            "Europe, Middle East, Africa": ["DEU", "FRA", "GBR", "ZAF", "ARE"],
-            "Latin America": ["MEX", "BRA", "ARG"],
-            "North America": ["USA", "CAN"]
-        };
-
-        let countries = [];
-        let values = [];
-
-        waterData.forEach(region => {
-            const codes = regionMap[region.Region] || [];
-            codes.forEach(code => {
-                countries.push(code);
-                values.push(region.Amount);
-            });
-        });
-
-        const data = [{
-            type: 'choropleth',
-            locationmode: 'ISO-3',
-            locations: countries,
-            z: values,
-            colorscale: 'Blues',
-            colorbar: {
-                title: 'Water Usage (ML)'
-            },
-            marker: {
-                line: {
-                    color: 'gray',
-                    width: 0.5
-                }
-            }
-        }];
-
-        const layout = {
-            title: 'Water Usage by Region (Filtered)',
-            geo: {
-                projection: {
-                    type: 'natural earth'
-                }
-            },
-            margin: { t: 50, l: 0, r: 0, b: 0 }
-        };
-
-        Plotly.newPlot('waterMapChart', data, layout);
-    </script>
-}

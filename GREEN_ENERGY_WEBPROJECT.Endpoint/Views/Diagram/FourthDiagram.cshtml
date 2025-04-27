@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Energy Consumption Trends";
     Layout = "~/Views/Shared/_HomeLayout.cshtml";
+    var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com";
 }
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -51,6 +52,22 @@
             border: none;
             border-radius: 5px;
         }
+
+    .save-button {
+        background-color: #00796b;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease;
+    }
+
+        .save-button:hover {
+            background-color: #005b50;
+        }
 </style>
 
 <div class="diag-background">
@@ -64,6 +81,26 @@
         </form>
 
         <canvas id="energyChart" width="1000" height="500"></canvas>
+
+        @if (isAdmin)
+        {
+            <form asp-action="SaveFourthDiagramDescription" method="post">
+                <textarea name="description" style="width:100%; height:200px; padding:10px; font-size:1rem;">@ViewBag.FourthDiagramDescription</textarea>
+                <br /><br />
+                <button type="submit" class="save-button">Save</button>
+            </form>
+        }
+        else
+        {
+            <p style="text-align: center; font-weight: bold;">
+                @Html.Raw(ViewBag.FourthDiagramDescription)
+            </p>
+        }
+
+        @* <p style="text-align: center; font-weight: bold;">
+            This diagram shows the evolution of energy consumption by source from 2019 to 2023.
+            It demonstrates how total energy demands have grown and how different energy sources have contributed to that growth.
+        </p> *@
     </div>
 </div>
 
@@ -84,6 +121,12 @@
             "On-site renewable electricity": "#aed581",
             "Total energy consumption": "#ba68c8",
             "Total electricity consumption": "#90a4ae"
+        };
+
+        const factoryColorMap = {
+            "Google": "#42a5f5",
+            "Microsoft": "#66bb6a",
+            "Meta": "#ff7043"
         };
 
         const datasets = [];
@@ -113,7 +156,7 @@
                         return match ? match.Value : 0;
                     }),
                     borderWidth: 1,
-                    backgroundColor: sourceColorMap[source] || '#ccc'
+                    backgroundColor: factoryColorMap[factory] || '#ccc'
                 });
             });
         }

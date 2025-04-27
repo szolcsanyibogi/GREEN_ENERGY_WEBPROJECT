@@ -8,7 +8,7 @@ using GREEN_ENERGY_WEBPROJECT.Models;
 string ConnectionString_DW = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_DW_GREEN;Integrated Security=True;Trust Server Certificate=True";
 string ConnectionString_STAR = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_STAR_GREEN;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
 
-var repo1 = new Repository(ConnectionString_STAR);
+//var repo1 = new Repository_GET(ConnectionString_STAR);
 var repo2 = new Repository_PUT(ConnectionString_DW);
 
 //repo1.GetFACTS(184, 2019, 9, 8);

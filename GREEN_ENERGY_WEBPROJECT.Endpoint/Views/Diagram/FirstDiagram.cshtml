@@ -1,11 +1,28 @@
 ﻿@{
     ViewData["Title"] = "PUE Diagram";
     Layout = "~/Views/Shared/_HomeLayout.cshtml";
+    var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com";
 }
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+    .save-button {
+        background-color: #00796b;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease;
+    }
+
+        .save-button:hover {
+            background-color: #005b50;
+        }
+
     .diag-background {
         background-image: url('../images/leaf_4.png');
         min-height: 100vh;
@@ -50,6 +67,26 @@
         </form>
 
         <canvas id="pueChart" width="1000" height="400"></canvas>
+
+        @if (isAdmin)
+        {
+            <form asp-action="SaveFirstDiagramDescription" method="post">
+                <textarea name="description" style="width:100%; height:200px; padding:10px; font-size:1rem;">@ViewBag.FirstDiagramDescription</textarea>
+                <br /><br />
+                <button type="submit" class="save-button">Save</button>
+            </form>
+        }
+        else
+        {
+            <p style="text-align: center; font-weight: bold;">
+                @Html.Raw(ViewBag.FirstDiagramDescription)
+            </p>
+        }
+        @* <p style="text-align: center; font-weight: bold;">
+            The diagram shows the average Power Usage Effectiveness (PUE) values by company from 2019 to 2023.
+            A lower PUE indicates a more energy-efficient data center.
+            It highlights how companies have improved or worsened their energy efficiency over the years.
+        </p> *@
     </div>
 </div>
 

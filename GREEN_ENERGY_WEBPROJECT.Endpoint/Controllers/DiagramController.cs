@@ -5,21 +5,27 @@ using GREEN_ENERGY_WEBPROJECT.Repository;
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using GREEN_ENERGY_WEBPROJECT.Models;
+using Microsoft.EntityFrameworkCore;
+using GREEN_ENERGY_WEBPROJECT.Endpoint.Data;
+using System.Text.RegularExpressions;
 
 namespace GREEN_ENERGY_WEBPROJECT.Controllers
 {
     public class DiagramController : Controller
     {
         private readonly Repository_GET _repository;
+        private readonly AppDbContext _context;
 
-        public DiagramController()
+        public DiagramController(AppDbContext context)
         {
             string connectionString = "Data Source=DESKTOP-09M9588;Initial Catalog=ATH_STAR_GREEN;Integrated Security=True;Encrypt=True;Trust Server Certificate=True";
             _repository = new Repository_GET(connectionString);
+            _context = context;
         }
 
         [HttpGet]
-        public IActionResult FirstDiagram(int? factoryId, int? year)
+        public async Task<IActionResult> FirstDiagram(int? factoryId, int? year)
         {
             var unit = _repository.GetUNIT_NAME("PUE").FirstOrDefault();
             if (unit == null) return View();
@@ -44,11 +50,34 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
             ViewBag.Factories = new SelectList(_repository.GetDistinctFactoryNames(), "FACTORY_ID", "FACTORY_NAME");
             ViewBag.Years = new SelectList(_repository.GetYears(), "YEAR", "YEAR");
 
+            var description = await _context.FirstDiagramContents.FirstOrDefaultAsync();
+            ViewBag.FirstDiagramDescription = description?.Description ?? "Default description for PUE diagram.";
+
             return View("FirstDiagram");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveFirstDiagramDescription(string description)
+        {
+            if (User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com")
+            {
+                var existing = await _context.FirstDiagramContents.FirstOrDefaultAsync();
+                if (existing == null)
+                    _context.FirstDiagramContents.Add(new FirstDiagramContent { Description = description });
+                else
+                {
+                    existing.Description = description;
+                    _context.FirstDiagramContents.Update(existing);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("FirstDiagram");
+        }
+
         [HttpGet]
-        public IActionResult SecondDiagram(int? factoryId, int? year)
+        public async Task<IActionResult> SecondDiagram(int? factoryId, int? year)
         {
             var metric = _repository.GetMETRIC_NAME("Waste generated").FirstOrDefault();
             if (metric == null) return View();
@@ -73,122 +102,75 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
             ViewBag.Factories = new SelectList(_repository.GetDistinctFactoryNames(), "FACTORY_ID", "FACTORY_NAME");
             ViewBag.Years = new SelectList(_repository.GetYears(), "YEAR", "YEAR");
 
+            var description = await _context.SecondDiagramContents.FirstOrDefaultAsync();
+            ViewBag.SecondDiagramDescription = description?.Description ?? "Default description for Waste diagram.";
+
             return View("SecondDiagram");
         }
 
-        [HttpGet]
-        public IActionResult ThirdDiagram(int? factoryId, int? year, string category)
+        [HttpPost]
+        public async Task<IActionResult> SaveSecondDiagramDescription(string description)
         {
-            ViewBag.Factories = new SelectList(_repository.GetDistinctFactoryNames(), "FACTORY_ID", "FACTORY_NAME", factoryId);
-            ViewBag.Years = new SelectList(_repository.GetYears(), "YEAR", "YEAR", year);
-            ViewBag.Categories = new SelectList(new List<string> { "Water withdrawal", "Water consumption", "Water discharges" }, category);
-
-            if (factoryId == null || year == null || string.IsNullOrEmpty(category))
+            if (User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com")
             {
-                ViewBag.WaterMapDataJson = "[]";
-                return View("ThirdDiagram");
-            }
-
-            var selectedFactory = _repository.GetFACTORY(factoryId.Value);
-            var dateId = _repository.GetAllDates().FirstOrDefault(d => d.YEAR == year)?.DATE_ID ?? -1;
-            if (selectedFactory == null || dateId == -1)
-            {
-                ViewBag.WaterMapDataJson = "[]";
-                return View("ThirdDiagram");
-            }
-
-            var facts = _repository.GetAllFacts()
-                .Where(f => f.FACTORY_ID == selectedFactory.FACTORY_ID && f.DATE_ID == dateId)
-                .ToList();
-
-            var metrics = _repository.GetDIM_METRIC();
-
-            var factsWithMetric = (from fact in facts
-                                   join metric in metrics on fact.METRIC_ID equals metric.METRIC_ID
-                                   select new
-                                   {
-                                       fact.FACTORY_ID,
-                                       fact.DATE_ID,
-                                       fact.VALUE,
-                                       MetricName = metric.METRIC_NAME
-                                   }).ToList();
-
-            if (!factsWithMetric.Any())
-            {
-                ViewBag.WaterMapDataJson = "[]";
-                return View("ThirdDiagram");
-            }
-
-            // 1. Eldobjuk a legnagyobb VALUE értéket a csoportonként (Factory + Date)
-            var grouped = factsWithMetric
-                .GroupBy(f => new { f.FACTORY_ID, f.DATE_ID })
-                .SelectMany(g =>
+                var existing = await _context.SecondDiagramContents.FirstOrDefaultAsync();
+                if (existing == null)
+                    _context.SecondDiagramContents.Add(new SecondDiagramContent { Description = description });
+                else
                 {
-                    var maxValue = g.Max(x => x.VALUE);
-                    return g.Where(x => x.VALUE != maxValue);
-                })
-                .Where(f => f.MetricName == category)
-                .ToList();
+                    existing.Description = description;
+                    _context.SecondDiagramContents.Update(existing);
+                }
 
-            // 2. Leképzés Factory + Category → Regio
-            var categoryRegionMap = new List<(string Factory, string Category, string Regio)>
-    {
-        ("Microsoft", "Water withdrawal", "Asia"),
-        ("Microsoft", "Water withdrawal", "Europe, Middle East, Africa"),
-        ("Microsoft", "Water withdrawal", "Latin America"),
-        ("Microsoft", "Water withdrawal", "North America"),
-        ("Microsoft", "Water consumption", "Asia"),
-        ("Microsoft", "Water consumption", "Europe, Middle East, Africa"),
-        ("Microsoft", "Water consumption", "Latin America"),
-        ("Microsoft", "Water consumption", "North America"),
-        ("Microsoft", "Water discharges", "Asia"),
-        ("Microsoft", "Water discharges", "Europe, Middle East, Africa"),
-        ("Microsoft", "Water discharges", "Latin America"),
-        ("Microsoft", "Water discharges", "North America"),
-        ("Google", "Water withdrawal", "Asia"),
-        ("Google", "Water withdrawal", "Europe, Middle East, Africa"),
-        ("Google", "Water withdrawal", "Latin America"),
-        ("Google", "Water withdrawal", "North America"),
-        ("Google", "Water consumption", "Asia"),
-        ("Google", "Water consumption", "Europe, Middle East, Africa"),
-        ("Google", "Water consumption", "Latin America"),
-        ("Google", "Water consumption", "North America"),
-        ("Google", "Water discharges", "Asia"),
-        ("Google", "Water discharges", "Europe, Middle East, Africa"),
-        ("Google", "Water discharges", "Latin America"),
-        ("Google", "Water discharges", "North America")
-    };
+                await _context.SaveChangesAsync();
+            }
 
-            var factoryName = selectedFactory.FACTORY_NAME;
-
-            // 3. Hozzárendeljük a régiókat, csak ha létezik rá párosítás
-            var finalData = grouped
-                .SelectMany(fact =>
-                    categoryRegionMap
-                        .Where(map => map.Factory == factoryName && map.Category == category)
-                        .Select(map => new
-                        {
-                            Region = map.Regio,
-                            Amount = fact.VALUE
-                        })
-                )
-                .ToList();
-
-            // 4. Régiók szerint összesítünk
-            var regionGrouped = finalData
-                .GroupBy(x => x.Region)
-                .Select(g => new
-                {
-                    Region = g.Key,
-                    Amount = Math.Round(g.Sum(x => x.Amount), 2)
-                }).ToList();
-
-            ViewBag.WaterMapDataJson = JsonConvert.SerializeObject(regionGrouped);
-
-            return View("ThirdDiagram");
+            return RedirectToAction("SecondDiagram");
         }
 
         [HttpGet]
+        public IActionResult ThirdDiagram(string factory, string regio, string category)
+        {
+            var data = _repository.GetWaterDataByRegion();
+
+            ViewBag.Factories = new SelectList(data.Select(d => d.Factory).Distinct().ToList());
+            ViewBag.Regios = new SelectList(data.Select(d => d.Regio).Distinct().ToList());
+            ViewBag.Categories = new SelectList(data.Select(d => d.Category).Distinct().ToList());
+
+            if (!string.IsNullOrEmpty(factory))
+                data = data.Where(d => d.Factory == factory).ToList();
+
+            if (!string.IsNullOrEmpty(regio))
+                data = data.Where(d => d.Regio == regio).ToList();
+
+            if (!string.IsNullOrEmpty(category))
+                data = data.Where(d => d.Category == category).ToList();
+
+            return View(data);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveThirdDiagramDescription(string description)
+        {
+            if (User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com")
+            {
+                var existing = await _context.ThirdDiagramContents.FirstOrDefaultAsync();
+                if (existing == null)
+                    _context.ThirdDiagramContents.Add(new ThirdDiagramContent { Description = description });
+                else
+                {
+                    existing.Description = description;
+                    _context.ThirdDiagramContents.Update(existing);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("ThirdDiagram");
+        }
+
         [HttpGet]
         public IActionResult FourthDiagram(int? factoryId, string source)
         {
@@ -290,10 +272,186 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
             return View("FourthDiagram");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveFourthDiagramDescription(string description)
+        {
+            if (User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com")
+            {
+                var existing = await _context.FourthDiagramContents.FirstOrDefaultAsync();
+                if (existing == null)
+                    _context.FourthDiagramContents.Add(new FourthDiagramContent { Description = description });
+                else
+                {
+                    existing.Description = description;
+                    _context.FourthDiagramContents.Update(existing);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("FourthDiagram");
+        }
+
+        [HttpGet]
+        public IActionResult FifthDiagram()
+        {
+            var unit = _repository.GetUNIT_NAME("%").FirstOrDefault();
+            var date = _repository.GetAllDates().FirstOrDefault(d => d.YEAR == 2023);
+
+            if (unit == null || date == null)
+            {
+                ViewBag.CFEDataJson = "[]";
+                ViewBag.CFETableData = new List<dynamic>();
+                return View("FifthDiagram");
+            }
+
+            var facts = _repository.GetAllFacts()
+                .Where(f => f.UNIT_ID == unit.UNIT_ID
+                            && f.DATE_ID == date.DATE_ID)
+                .ToList();
+
+            // Térképes diagramhoz: országonként átlag
+            var grouped = facts
+                .Where(f => f.FACTORY != null)
+                .GroupBy(f => f.FACTORY.COUNTRY)
+                .Select(g => new
+                {
+                    Country = g.Key,
+                    Percentage = Math.Round(g.Average(f => f.VALUE), 2)
+                })
+                .ToList();
+
+            ViewBag.CFEDataJson = JsonConvert.SerializeObject(grouped);
+
+            // Táblázathoz: részletes adatok
+            var tableData = facts
+            .Where(f => f.FACTORY != null)
+            .GroupBy(f => new
+            {
+                f.FACTORY.COUNTRY,
+                f.FACTORY.REGIO,
+                f.FACTORY.FACTORY_NAME,
+                f.UNIT.UNIT_NAME
+            })
+            .Select(g => new
+            {
+                Country = g.Key.COUNTRY,
+                Region = g.Key.REGIO,
+                Factory = g.Key.FACTORY_NAME,
+                Unit = g.Key.UNIT_NAME,
+                CFE_Percentage = Math.Round(g.Average(f => f.VALUE), 2)
+            })
+            .ToList();
 
 
+            ViewBag.CFETableData = tableData;
 
+            return View("FifthDiagram");
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveFifthDiagramDescription(string description)
+        {
+            if (User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com")
+            {
+                var existing = await _context.FifthDiagramContents.FirstOrDefaultAsync();
+                if (existing == null)
+                    _context.FifthDiagramContents.Add(new FifthDiagramContent { Description = description });
+                else
+                {
+                    existing.Description = description;
+                    _context.FifthDiagramContents.Update(existing);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("FifthDiagram");
+        }
+
+        [HttpGet]
+        public IActionResult SixthDiagram()
+        {
+            var allFacts = _repository.GetAllFacts();
+            var allMetrics = _repository.GetDIM_METRIC();
+            var dates = _repository.GetAllDates();
+
+            if (allFacts == null || allMetrics == null || dates == null)
+            {
+                ViewBag.GHGDataJson = "[]";
+                return View("GreenhouseGasIntensityDiagram");
+            }
+
+            var energyMetrics = allMetrics
+                .Where(m => m.METRIC_NAME.Contains("Total energy consumption"))
+                .Select(m => m.METRIC_ID)
+                .ToList();
+
+            var ghgMetrics = allMetrics
+                .Where(m => m.METRIC_NAME.Contains("GHG intensity per MWh") ||
+                            m.METRIC_NAME.Contains("Carbon intensity per megawatthour of energy consumed"))
+                .Select(m => m.METRIC_ID)
+                .ToList();
+
+            var ghgData = new List<object>();
+
+            foreach (var year in new[] { 2019, 2020, 2021, 2022, 2023 })
+            {
+                var dateId = dates.FirstOrDefault(d => d.YEAR == year)?.DATE_ID ?? -1;
+                if (dateId == -1) continue;
+
+                var energyFacts = allFacts
+                    .Where(f => energyMetrics.Contains(f.METRIC_ID) && f.DATE_ID == dateId)
+                    .ToList();
+
+                var ghgFacts = allFacts
+                    .Where(f => ghgMetrics.Contains(f.METRIC_ID) && f.DATE_ID == dateId)
+                    .ToList();
+
+                var joined = energyFacts
+                    .Join(
+                        ghgFacts,
+                        e => e.FACTORY_ID,
+                        g => g.FACTORY_ID,
+                        (e, g) => new { Factory = e.FACTORY, EnergyConsumption = e.VALUE, GHGIntensity = g.VALUE }
+                    )
+                    .GroupBy(x => new { x.Factory.FACTORY_NAME, year })
+                    .Select(g => new
+                    {
+                        Company = g.Key.FACTORY_NAME,
+                        Year = g.Key.year,
+                        EnergyConsumption = Math.Round(g.Average(x => x.EnergyConsumption), 2),
+                        GHGIntensity = Math.Round(g.Average(x => x.GHGIntensity), 5)
+                    })
+                    .ToList();
+
+                ghgData.AddRange(joined);
+            }
+
+            ViewBag.GHGDataJson = JsonConvert.SerializeObject(ghgData);
+
+            return View("SixthDiagram");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveSixthDiagramDescription(string description)
+        {
+            if (User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com")
+            {
+                var existing = await _context.SixthDiagramContents.FirstOrDefaultAsync();
+                if (existing == null)
+                    _context.SixthDiagramContents.Add(new SixthDiagramContent { Description = description });
+                else
+                {
+                    existing.Description = description;
+                    _context.SixthDiagramContents.Update(existing);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("SixthDiagram");
+        }
 
 
 

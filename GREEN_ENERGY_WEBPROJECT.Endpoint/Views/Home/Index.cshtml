@@ -1,17 +1,40 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_HomeLayout.cshtml";
+    var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com";
 }
 
+
+<div class="diag-background">
+    <div class="diag-content">
+        <div class="section-title">Welcome</div>
+
+        @if (isAdmin)
+        {
+            <form asp-action="SaveContent" method="post">
+                <textarea name="content" style="width:100%; height:400px; padding:10px; font-size:1rem;">@ViewBag.ContentText</textarea>
+                <br /><br />
+                <button type="submit" class="save-button">Save</button>
+            </form>
+        }
+        else
+        {
+            @Html.Raw(ViewBag.ContentText) <!-- ITT A LÉNYEG -->
+        }
+    </div>
+</div>
+
 <style>
-    .home-background {
+    .diag-background {
         background-image: url('../images/leaf_4.png');
-        background-repeat: repeat;
-        background-size: auto;
-        background-position: top left;
+        min-height: 100vh;
+        padding: 50px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
     }
 
-    .home-content {
+    .diag-content {
         background-color: #c7dbbf;
         padding: 40px;
         border-radius: 20px;
@@ -19,30 +42,37 @@
         width: 100%;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.8;
         font-size: 17px;
-        opacity: .9;
+        opacity: .95;
     }
-
-        .home-content p {
-            margin-bottom: 30px;
-        }
-
-        .home-content strong {
-            font-size: 18px;
-            color: #2e7d32;
-        }
 
     .section-title {
         font-size: 22px;
         font-weight: bold;
         color: #00796b;
-        margin-bottom: 10px;
-        display: inline-block;
+        margin-bottom: 20px;
+        text-align: center;
     }
+
+    .save-button {
+        background-color: #00796b;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease;
+    }
+
+        .save-button:hover {
+            background-color: #005b50;
+        }
 </style>
 
-<div class="home-background">
+
+@* <div class="home-background">
     <div class="home-content">
 
         <p>
@@ -76,4 +106,4 @@
         </p>
 
     </div>
-</div>
+</div> *@
