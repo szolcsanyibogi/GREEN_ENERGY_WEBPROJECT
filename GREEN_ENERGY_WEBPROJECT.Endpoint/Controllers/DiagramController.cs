@@ -129,25 +129,47 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
         }
 
         [HttpGet]
-        public IActionResult ThirdDiagram(string factory, string regio, string category)
+        public IActionResult ThirdDiagram(string factory)
         {
-            var data = _repository.GetWaterDataByRegion();
+            var facts = _repository.GetAllFacts();
+            var metrics = _repository.GetDIM_METRIC();
+            var factories = _repository.GetAllFactories();
 
-            ViewBag.Factories = new SelectList(data.Select(d => d.Factory).Distinct().ToList());
-            ViewBag.Regios = new SelectList(data.Select(d => d.Regio).Distinct().ToList());
-            ViewBag.Categories = new SelectList(data.Select(d => d.Category).Distinct().ToList());
+            ViewBag.Factories = new SelectList(factories.Select(f => f.FACTORY_NAME).Distinct(), factory);
+
+            var waterCategories = new List<string> { "Water withdrawal", "Water discharge", "Water consumption" };
+
+            var data = (from fact in facts
+                        join metric in metrics on fact.METRIC_ID equals metric.METRIC_ID
+                        join factFactory in factories on fact.FACTORY_ID equals factFactory.FACTORY_ID
+                        where waterCategories.Contains(metric.METRIC_NAME)
+                        select new
+                        {
+                            Factory = factFactory.FACTORY_NAME,
+                            MetricName = metric.METRIC_NAME,
+                            Year = fact.DATE.YEAR,
+                            Value = fact.VALUE
+                        }).ToList();
 
             if (!string.IsNullOrEmpty(factory))
+            {
                 data = data.Where(d => d.Factory == factory).ToList();
+            }
 
-            if (!string.IsNullOrEmpty(regio))
-                data = data.Where(d => d.Regio == regio).ToList();
+            var groupedData = data
+                .GroupBy(d => new { d.MetricName, d.Year })
+                .Select(g => new
+                {
+                    Metric = g.Key.MetricName,
+                    Year = g.Key.Year,
+                    AvgValue = g.Average(x => x.Value)
+                }).ToList();
 
-            if (!string.IsNullOrEmpty(category))
-                data = data.Where(d => d.Category == category).ToList();
+            ViewBag.WaterDataJson = JsonConvert.SerializeObject(groupedData);
 
-            return View(data);
+            return View();
         }
+
 
 
 

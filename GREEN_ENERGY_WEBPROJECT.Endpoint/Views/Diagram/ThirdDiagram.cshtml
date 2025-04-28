@@ -1,10 +1,10 @@
-﻿@model List<GREEN_ENERGY_WEBPROJECT.Repository.Repository_GET.WaterDataByRegion>
-
-@{
-    ViewData["Title"] = "Water Data by Region";
+﻿@{
+    ViewData["Title"] = "Water Usage Trends";
     Layout = "~/Views/Shared/_HomeLayout.cshtml";
     var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin@green.com";
 }
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
     .save-button {
@@ -68,96 +68,20 @@
         color: white;
         cursor: pointer;
     }
-
-    <style >
-    /* Táblázat stílus */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #f5f5f5;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    thead {
-        background-color: #00796b;
-        color: white;
-    }
-
-    th, td {
-        padding: 12px 15px;
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-        font-size: 16px;
-    }
-
-    tr:hover {
-        background-color: #e0f2f1;
-    }
-
-    th {
-        font-weight: bold;
-        font-size: 17px;
-    }
-
-    tbody tr:last-child td {
-        border-bottom: none;
-    }
-</style>
-
 </style>
 
 <div class="diag-background">
     <div class="diag-content">
-        <div class="section-title">Water Usage Data by Region (2019–2023)</div>
+        <div class="section-title">Water Usage Trends by Factory (2019–2023)</div>
 
         <form method="get" action="@Url.Action("ThirdDiagram", "Diagram")">
             <label for="factory">Factory:</label>
-            @Html.DropDownList("factory", ViewBag.Factories as SelectList, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
-
-            <label for="regio">Regio:</label>
-            @Html.DropDownList("regio", ViewBag.Regios as SelectList, "Select a region", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
-
-            <label for="category">Category:</label>
-            @Html.DropDownList("category", ViewBag.Categories as SelectList, "Select a category", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+            @Html.DropDownList("factory", ViewBag.Factories as SelectList, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block; margin-right: 10px;" })
 
             <button type="submit">Filter</button>
         </form>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Region</th>
-                    <th>Factory</th>
-                    <th>Unit</th>
-                    <th>Category</th>
-                    <th>2019</th>
-                    <th>2020</th>
-                    <th>2021</th>
-                    <th>2022</th>
-                    <th>2023</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.Regio</td>
-                        <td>@item.Factory</td>
-                        <td>@item.Unit</td>
-                        <td>@item.Category</td>
-                        <td>@(item.Year2019.HasValue ? item.Year2019.Value.ToString("F2") : "N/A")</td>
-                        <td>@(item.Year2020.HasValue ? item.Year2020.Value.ToString("F2") : "N/A")</td>
-                        <td>@(item.Year2021.HasValue ? item.Year2021.Value.ToString("F2") : "N/A")</td>
-                        <td>@(item.Year2022.HasValue ? item.Year2022.Value.ToString("F2") : "N/A")</td>
-                        <td>@(item.Year2023.HasValue ? item.Year2023.Value.ToString("F2") : "N/A")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-
+        <canvas id="waterLineChart" width="1000" height="400"></canvas>
 
         @if (isAdmin)
         {
@@ -175,3 +99,83 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const waterData = @Html.Raw(ViewBag.WaterDataJson ?? "[]");
+
+        const grouped = {};
+
+        waterData.forEach(item => {
+            if (!grouped[item.Metric]) grouped[item.Metric] = {};
+            grouped[item.Metric][item.Year] = item.AvgValue;
+        });
+
+        const years = [...new Set(waterData.map(item => item.Year))].sort();
+        const metrics = Object.keys(grouped);
+
+        const colors = ['#4caf50', '#2196f3', '#ff9800', '#9c27b0', '#f44336', '#00bcd4', '#795548'];
+
+        const datasets = metrics.map((metric, index) => ({
+            label: metric,
+            data: years.map(year => grouped[metric][year] ?? null),
+            borderColor: colors[index % colors.length],
+            backgroundColor: colors[index % colors.length],
+            fill: false,
+            tension: 0.3,
+            pointHoverRadius: 8,
+            pointRadius: 5,
+            pointHoverBackgroundColor: colors[index % colors.length],
+            pointBorderWidth: 2
+        }));
+
+        const ctx = document.getElementById('waterLineChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Water Usage (ML)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}
