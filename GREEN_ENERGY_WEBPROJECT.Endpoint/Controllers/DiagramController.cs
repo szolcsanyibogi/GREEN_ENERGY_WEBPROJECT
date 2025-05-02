@@ -38,6 +38,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
                 .ToList();
 
             var grouped = filtered
+                .Where(f => f.FACTORY != null && f.DATE != null)
                 .GroupBy(f => new { f.FACTORY.FACTORY_NAME, f.DATE.YEAR })
                 .Select(g => new
                 {
@@ -45,6 +46,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
                     Year = g.Key.YEAR,
                     AvgPUE = Math.Round(g.Average(f => f.VALUE), 2)
                 }).ToList();
+
 
             ViewBag.PUEDataJson = JsonConvert.SerializeObject(grouped);
             ViewBag.Factories = new SelectList(_repository.GetDistinctFactoryNames(), "FACTORY_ID", "FACTORY_NAME");
@@ -84,21 +86,29 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
 
             var allFacts = _repository.GetFACTS_BY_METRICID(metric.METRIC_ID);
 
-            var filtered = allFacts
-                .Where(f => (factoryId == null || f.FACTORY.FACTORY_NAME == _repository.GetFACTORY(factoryId.Value)?.FACTORY_NAME) &&
-                            (year == null || f.DATE.YEAR == year))
+            var validFacts = allFacts
+                .Where(f =>
+                    f.FACTORY != null &&
+                    f.DATE != null &&
+                    f.VALUE != null &&
+                    (factoryId == null || f.FACTORY.FACTORY_ID == factoryId) &&
+                    (year == null || f.DATE.YEAR == year))
                 .ToList();
 
-            var grouped = filtered
+            var grouped = validFacts
                 .GroupBy(f => new { f.FACTORY.FACTORY_NAME, f.DATE.YEAR })
                 .Select(g => new
                 {
                     FactoryName = g.Key.FACTORY_NAME,
                     Year = g.Key.YEAR,
                     AvgWaste = Math.Round(g.Average(f => f.VALUE), 2)
-                }).ToList();
+                })
+                .Where(g => g.AvgWaste > 0) // opcionális, ha 0-át sem szeretnél
+                .ToList();
 
             ViewBag.WasteDataJson = JsonConvert.SerializeObject(grouped);
+
+
             ViewBag.Factories = new SelectList(_repository.GetDistinctFactoryNames(), "FACTORY_ID", "FACTORY_NAME");
             ViewBag.Years = new SelectList(_repository.GetYears(), "YEAR", "YEAR");
 
@@ -169,9 +179,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
 
             return View();
         }
-
-
-
 
         [HttpPost]
         public async Task<IActionResult> SaveThirdDiagramDescription(string description)
@@ -317,10 +324,10 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
         [HttpGet]
         public IActionResult FifthDiagram()
         {
-            var unit = _repository.GetUNIT_NAME("%").FirstOrDefault();
+            var unitName = "%";
             var date = _repository.GetAllDates().FirstOrDefault(d => d.YEAR == 2023);
 
-            if (unit == null || date == null)
+            if (date == null)
             {
                 ViewBag.CFEDataJson = "[]";
                 ViewBag.CFETableData = new List<dynamic>();
@@ -328,13 +335,15 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
             }
 
             var facts = _repository.GetAllFacts()
-                .Where(f => f.UNIT_ID == unit.UNIT_ID
-                            && f.DATE_ID == date.DATE_ID)
+                .Where(f =>
+                    f.DATE_ID == date.DATE_ID &&
+                    f.UNIT != null &&
+                    f.UNIT.UNIT_NAME == unitName &&
+                    f.FACTORY != null &&
+                    f.VALUE != null)
                 .ToList();
 
-            // Térképes diagramhoz: országonként átlag
             var grouped = facts
-                .Where(f => f.FACTORY != null)
                 .GroupBy(f => f.FACTORY.COUNTRY)
                 .Select(g => new
                 {
@@ -345,31 +354,28 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
 
             ViewBag.CFEDataJson = JsonConvert.SerializeObject(grouped);
 
-            // Táblázathoz: részletes adatok
             var tableData = facts
-            .Where(f => f.FACTORY != null)
-            .GroupBy(f => new
-            {
-                f.FACTORY.COUNTRY,
-                f.FACTORY.REGIO,
-                f.FACTORY.FACTORY_NAME,
-                f.UNIT.UNIT_NAME
-            })
-            .Select(g => new
-            {
-                Country = g.Key.COUNTRY,
-                Region = g.Key.REGIO,
-                Factory = g.Key.FACTORY_NAME,
-                Unit = g.Key.UNIT_NAME,
-                CFE_Percentage = Math.Round(g.Average(f => f.VALUE), 2)
-            })
-            .ToList();
-
+                .GroupBy(f => new
+                {
+                    f.FACTORY.COUNTRY,
+                    f.FACTORY.REGIO,
+                    f.FACTORY.FACTORY_NAME
+                })
+                .Select(g => new
+                {
+                    Country = g.Key.COUNTRY,
+                    Region = g.Key.REGIO,
+                    Factory = g.Key.FACTORY_NAME,
+                    Unit = unitName,
+                    CFE_Percentage = Math.Round(g.Average(f => f.VALUE), 2)
+                })
+                .ToList();
 
             ViewBag.CFETableData = tableData;
 
             return View("FifthDiagram");
         }
+
 
         [HttpPost]
         public async Task<IActionResult> SaveFifthDiagramDescription(string description)

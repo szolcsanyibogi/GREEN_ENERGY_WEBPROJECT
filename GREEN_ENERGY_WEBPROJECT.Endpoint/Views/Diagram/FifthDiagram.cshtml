@@ -139,9 +139,16 @@
             locationmode: 'country names',
             locations: countries,
             z: percentages,
-            colorscale: 'Greens',
+            zmin: 0, // minimum érték
+            zmax: 100, // maximum, ha százalékról van szó
+            colorscale: [
+                [0, '#e8f5e9'],      // világos zöld (alacsony érték)
+                [0.5, '#66bb6a'],    // középzöld
+                [1, '#1b5e20']       // sötétzöld (magas érték)
+            ],
             colorbar: {
-                title: 'CFE %'
+                title: 'CFE %',
+                ticksuffix: '%'
             },
             marker: {
                 line: {
@@ -150,6 +157,7 @@
                 }
             }
         }];
+
 
         var layout = {
             title: 'Carbon Free Energy Percentage by Country (2023)',

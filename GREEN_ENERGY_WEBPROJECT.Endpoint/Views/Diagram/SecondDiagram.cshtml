@@ -111,50 +111,72 @@
 @section Scripts {
     <script>
         const wasteData = @Html.Raw(ViewBag.WasteDataJson ?? "[]");
-        const colors = ['#4caf50', '#ff9800', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#795548'];
 
-        const wasteGrouped = {};
-        wasteData.forEach(item => {
-            if (!wasteGrouped[item.FactoryName]) wasteGrouped[item.FactoryName] = {};
-            wasteGrouped[item.FactoryName][item.Year] = item.AvgWaste;
-        });
+        if (wasteData.length === 0) {
+            document.getElementById('wasteChart').remove();
+            const msg = document.createElement('p');
+            msg.textContent = "Nincs megjeleníthető adat a kiválasztott szűrőkkel.";
+            msg.style.textAlign = 'center';
+            msg.style.fontWeight = 'bold';
+            msg.style.fontSize = '18px';
+            document.querySelector('.diag-content').appendChild(msg);
+        } else {
+            const colors = ['#4caf50', '#ff9800', '#2196f3', '#9c27b0', '#f44336', '#00bcd4', '#795548'];
 
-        const years = [...new Set(wasteData.map(p => p.Year))].sort();
-        const companies = Object.keys(wasteGrouped);
+            const yearsSet = new Set();
+            const companyYearWaste = {};
 
-        const wasteDatasets = companies.map((company, i) => ({
-            label: company,
-            data: years.map(y => wasteGrouped[company][y] ?? null),
-            backgroundColor: colors[i % colors.length]
-        }));
+            wasteData.forEach(item => {
+                if (!companyYearWaste[item.FactoryName]) {
+                    companyYearWaste[item.FactoryName] = {};
+                }
+                if (item.AvgWaste !== null) {
+                    companyYearWaste[item.FactoryName][item.Year] = item.AvgWaste;
+                    yearsSet.add(item.Year);
+                }
+            });
 
-        new Chart(document.getElementById('wasteChart'), {
-            type: 'bar',
-            data: {
-                labels: years,
-                datasets: wasteDatasets
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' },
-                    tooltip: { enabled: true },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        formatter: val => val?.toFixed(2) + ' t'
-                    }
+            const years = Array.from(yearsSet).sort();
+            const companies = Object.keys(companyYearWaste);
+
+            const wasteDatasets = companies
+                .filter(company => years.some(y => companyYearWaste[company][y] !== undefined))
+                .map((company, i) => ({
+                    label: company,
+                    data: years.map(y => companyYearWaste[company][y]),
+                    backgroundColor: colors[i % colors.length]
+                }));
+
+            new Chart(document.getElementById('wasteChart'), {
+                type: 'bar',
+                data: {
+                    labels: years,
+                    datasets: wasteDatasets
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'Waste (tons)' }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { enabled: true },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: val => val?.toFixed(2) + ' t'
+                        }
                     },
-                    x: {
-                        title: { display: true, text: 'Year' }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Waste (tons)' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Year' }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+
+
     </script>
 }
