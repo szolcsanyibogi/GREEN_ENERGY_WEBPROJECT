@@ -465,12 +465,12 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             using (SqlCommand cmd = new SqlCommand(query, con))
             using (SqlDataReader reader = cmd.ExecuteReader())
             {
-                int tempId = 1; // ideiglenes ID, mivel FACTORY_ID nem lesz benne a lekérdezésben
+                int tempId = 1;
                 while (reader.Read())
                 {
                     factories.Add(new FACTORY
                     {
-                        FACTORY_ID = tempId++, // vagy null/0 ha nem használnád a ViewBag-ben
+                        FACTORY_ID = tempId++,
                         FACTORY_NAME = reader.GetString(0)
                     });
                 }
@@ -611,7 +611,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
 
             reader.Close();
 
-            // Töltés kapcsolódó entitásokkal, ha az ID érvényes
             foreach (var fact in facts)
             {
                 if (fact.FACTORY_ID > 0)

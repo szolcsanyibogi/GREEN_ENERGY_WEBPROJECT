@@ -68,6 +68,24 @@
         .save-button:hover {
             background-color: #005b50;
         }
+
+    form {
+        margin-bottom: 30px;
+    }
+
+    select, button {
+        padding: 10px;
+        margin-right: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    button {
+        background-color: #00796b;
+        color: white;
+        cursor: pointer;
+    }
 </style>
 
 <div class="diag-background">
@@ -75,9 +93,12 @@
         <div class="section-title">Energy Consumption by Source and Company (2019–2023)</div>
 
         <form asp-controller="Diagram" asp-action="FourthDiagram" method="get" class="filter-form">
-            @Html.DropDownList("factoryId", ViewBag.Factories as SelectList, "All Companies", new { @class = "form-control" })
+            <label for="factory">Factory:</label>
+            @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+
+            <label for="source">Source:</label>
             @Html.DropDownList("source", ViewBag.Sources as SelectList, "All Source", new { @class = "form-control", required = "required" })
-            <button type="submit">Update</button>
+            <button type="submit">Filter</button>
         </form>
 
         <canvas id="energyChart" width="1000" height="500"></canvas>

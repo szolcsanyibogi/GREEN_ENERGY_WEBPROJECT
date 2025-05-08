@@ -103,7 +103,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
                     Year = g.Key.YEAR,
                     AvgWaste = Math.Round(g.Average(f => f.VALUE), 2)
                 })
-                .Where(g => g.AvgWaste > 0) // opcionális, ha 0-át sem szeretnél
+                .Where(g => g.AvgWaste > 0)
                 .ToList();
 
             ViewBag.WasteDataJson = JsonConvert.SerializeObject(grouped);
@@ -204,16 +204,16 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
         public IActionResult FourthDiagram(int? factoryId, string source)
         {
             var allowedSources = new List<string>
-    {
-        "Fuel",
-        "Electricity",
-        "Hot water",
-        "Steam",
-        "Cooling",
-        "On-site renewable electricity",
-        "Total energy consumption",
-        "Total electricity consumption"
-    };
+            {
+                "Fuel",
+                "Electricity",
+                "Hot water",
+                "Steam",
+                "Cooling",
+                "On-site renewable electricity",
+                "Total energy consumption",
+                "Total electricity consumption"
+            };
 
             ViewBag.Factories = new SelectList(_repository.GetDistinctFactoryNames(), "FACTORY_ID", "FACTORY_NAME", factoryId);
             ViewBag.Sources = new SelectList(new[] { "All Source" }.Concat(allowedSources), source ?? "All Source");
@@ -228,7 +228,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
                 source = "All Source";
             }
 
-            // Összekapcsoljuk a tényadatokat a metrikákkal
+
             var factWithMetric = allFacts
                 .Join(metrics, f => f.METRIC_ID, m => m.METRIC_ID, (f, m) => new
                 {
@@ -240,7 +240,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
 
             if (source == "All Source")
             {
-                // Minden energiaforrást hozunk, csoportosítva gyár és forrás szerint
                 result = factWithMetric
                     .Where(x => allowedSources.Contains(x.MetricName))
                     .Join(dates, x => x.Fact.DATE_ID, d => d.DATE_ID, (x, d) => new
@@ -269,7 +268,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
             }
             else
             {
-                // Csak a kiválasztott energiaforrást hozzuk, gyáronként csoportosítva
                 result = factWithMetric
                     .Where(x => x.MetricName == source)
                     .Join(dates, x => x.Fact.DATE_ID, d => d.DATE_ID, (x, d) => new

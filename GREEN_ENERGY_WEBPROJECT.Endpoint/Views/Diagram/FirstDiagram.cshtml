@@ -50,13 +50,31 @@
         color: #00796b;
         margin-bottom: 20px;
     }
+
+    form {
+        margin-bottom: 30px;
+    }
+
+    select, button {
+        padding: 10px;
+        margin-right: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    button {
+        background-color: #00796b;
+        color: white;
+        cursor: pointer;
+    }
 </style>
 
 <div class="diag-background">
     <div class="diag-content">
         <div class="section-title">PUE Averages per Company (2019–2023)</div>
 
-        <form method="get" action="@Url.Action("FirstDiagram", "Diagram")">
+        <form method="get" action="@Url.Action("SecondDiagram", "Diagram")">
             <label for="factory">Factory:</label>
             @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
 

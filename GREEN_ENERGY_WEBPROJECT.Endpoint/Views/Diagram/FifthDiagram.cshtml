@@ -96,35 +96,6 @@
             It highlights which countries operate the greenest data centers and where further improvements are needed.
         </p> *@
     </div>
-
-    <div class="diag-content">
-        <p style="text-align: center; font-weight: bold;">On the map chart, we show the average carbon-free energy percentage per country. More precise data can be found in the table below.</p>
-        
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Country</th>
-                    <th>Region</th>
-                    <th>Factory</th>
-                    <th>Unit</th>
-                    <th>CFE %</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in ViewBag.CFETableData ?? new List<dynamic>())
-                {
-                    <tr>
-                        <td>@item.Country</td>
-                        <td>@item.Region</td>
-                        <td>@item.Factory</td>
-                        <td>@item.Unit</td>
-                        <td>@item.CFE_Percentage</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
 </div>
 
 @section Scripts {
@@ -139,12 +110,12 @@
             locationmode: 'country names',
             locations: countries,
             z: percentages,
-            zmin: 0, // minimum érték
-            zmax: 100, // maximum, ha százalékról van szó
+            zmin: 30,
+            zmax: 70,
             colorscale: [
-                [0, '#e8f5e9'],      // világos zöld (alacsony érték)
-                [0.5, '#66bb6a'],    // középzöld
-                [1, '#1b5e20']       // sötétzöld (magas érték)
+                [0, '#e8f5e9'],    
+                [0.5, '#66bb6a'],    
+                [1, '#1b5e20']      
             ],
             colorbar: {
                 title: 'CFE %',
@@ -160,7 +131,7 @@
 
 
         var layout = {
-            title: 'Carbon Free Energy Percentage by Country (2023)',
+            title: '',
             geo: {
                 projection: {
                     type: 'natural earth'
