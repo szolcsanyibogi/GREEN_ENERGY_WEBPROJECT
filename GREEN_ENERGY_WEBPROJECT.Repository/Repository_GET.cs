@@ -34,7 +34,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             if (con.State != ConnectionState.Open) con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
 
-            // 1. Beolvasás memóriába
             while (reader.Read())
             {
                 var fact = new FACT()
@@ -51,7 +50,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
 
             reader.Close();
 
-            // 2. Kapcsolódó adatok betöltése csak a reader bezárása után
             foreach (var fact in facts)
             {
                 fact.FACTORY = GetFACTORY(fact.FACTORY_ID);
@@ -91,7 +89,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
 
             reader.Close();
 
-            // Töltés kapcsolódó entitásokkal, csak ha az ID érvényes
             foreach (var fact in facts)
             {
                 if (fact.FACTORY_ID > 0)
@@ -122,7 +119,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             if (con.State != ConnectionState.Open) con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
 
-            // 1. Beolvasás memóriába
             while (reader.Read())
             {
                 var fact = new FACT()
@@ -139,7 +135,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
 
             reader.Close();
 
-            // 2. Kapcsolódó adatok betöltése csak a reader bezárása után
             foreach (var fact in facts)
             {
                 fact.FACTORY = GetFACTORY(fact.FACTORY_ID);
@@ -162,7 +157,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             if (con.State != ConnectionState.Open) con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
 
-            // 1. Beolvasás memóriába
             while (reader.Read())
             {
                 var fact = new FACT()
@@ -179,7 +173,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
 
             reader.Close();
 
-            // 2. Kapcsolódó adatok betöltése csak a reader bezárása után
             foreach (var fact in facts)
             {
                 fact.FACTORY = GetFACTORY(fact.FACTORY_ID);
@@ -202,7 +195,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
             if (con.State != ConnectionState.Open) con.Open();
             SqlDataReader reader = cmd.ExecuteReader();
 
-            // 1. Beolvasás memóriába
             while (reader.Read())
             {
                 var fact = new FACT()
@@ -219,7 +211,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository
 
             reader.Close();
 
-            // 2. Kapcsolódó adatok betöltése csak a reader bezárása után
+
             foreach (var fact in facts)
             {
                 fact.FACTORY = GetFACTORY(fact.FACTORY_ID);

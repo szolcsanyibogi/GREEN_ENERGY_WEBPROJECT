@@ -33,7 +33,8 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
             var allFacts = _repository.GetFACTS_BY_UNITID(unit.UNIT_ID);
 
             var filtered = allFacts
-                .Where(f => (factoryId == null || f.FACTORY.FACTORY_NAME == _repository.GetFACTORY(factoryId.Value)?.FACTORY_NAME) &&
+                .Where(f => (factoryId == null || f.FACTORY.FACTORY_NAME == 
+                _repository.GetFACTORY(factoryId.Value)?.FACTORY_NAME) &&
                             (year == null || f.DATE.YEAR == year))
                 .ToList();
 
@@ -351,26 +352,6 @@ namespace GREEN_ENERGY_WEBPROJECT.Controllers
                 .ToList();
 
             ViewBag.CFEDataJson = JsonConvert.SerializeObject(grouped);
-
-            var tableData = facts
-                .GroupBy(f => new
-                {
-                    f.FACTORY.COUNTRY,
-                    f.FACTORY.REGIO,
-                    f.FACTORY.FACTORY_NAME
-                })
-                .Select(g => new
-                {
-                    Country = g.Key.COUNTRY,
-                    Region = g.Key.REGIO,
-                    Factory = g.Key.FACTORY_NAME,
-                    Unit = unitName,
-                    CFE_Percentage = Math.Round(g.Average(f => f.VALUE), 2)
-                })
-                .ToList();
-
-            ViewBag.CFETableData = tableData;
-
             return View("FifthDiagram");
         }
 

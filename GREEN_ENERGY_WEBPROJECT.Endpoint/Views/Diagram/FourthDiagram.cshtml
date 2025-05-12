@@ -94,10 +94,12 @@
 
         <form asp-controller="Diagram" asp-action="FourthDiagram" method="get" class="filter-form">
             <label for="factory">Factory:</label>
-            @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+            @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory",
+            new { @class = "form-control", style = "width: 200px; display: inline-block;" })
 
             <label for="source">Source:</label>
-            @Html.DropDownList("source", ViewBag.Sources as SelectList, "All Source", new { @class = "form-control", required = "required" })
+            @Html.DropDownList("source", ViewBag.Sources as SelectList, "All Source", 
+            new { @class = "form-control", required = "required" })
             <button type="submit">Filter</button>
         </form>
 

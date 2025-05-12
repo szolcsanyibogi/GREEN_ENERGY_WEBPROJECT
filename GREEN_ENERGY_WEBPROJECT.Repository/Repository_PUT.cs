@@ -126,7 +126,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
 
         public WATERBYREGIO PutWaterByRegio(string regio, string factory, string unit, string category, float y2019, float y2020, float y2021, float y2022, float y2023)
         {
-            // 1. Vedd ki a megfelelő water_id-t a DW_Water táblából, ahol unit == category
+
             int waterId = -1;
             using (SqlCommand getIdCmd = new SqlCommand("SELECT water_id FROM DW_Water WHERE [Water_Metrics] = @category", con))
             {
@@ -138,7 +138,7 @@ namespace GREEN_ENERGY_WEBPROJECT.Repository_PUT
                     waterId = Convert.ToInt32(result);
             }
 
-            // 2. Insert a DW_Water_By_Regio táblába
+
             string insertQuery = @"
                 INSERT INTO DW_Water_By_Regio 
                 (water_Regio_id, regio, factory, unit, Category, water_id, YEAR_2019, YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023) 

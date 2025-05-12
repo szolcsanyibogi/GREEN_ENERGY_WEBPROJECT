@@ -69,7 +69,6 @@
             background-color: #005b50;
         }
 </style>
-
 <div class="diag-background">
     <div class="diag-content">
         <div class="section-title">Carbon Free Energy Percentage by Country (2023)</div>
@@ -106,40 +105,21 @@
         const percentages = cfeData.map(item => item.Percentage);
 
         var data = [{
-            type: 'choropleth',
-            locationmode: 'country names',
-            locations: countries,
-            z: percentages,
-            zmin: 30,
-            zmax: 70,
+            type: 'choropleth', locationmode: 'country names',
+            locations: countries, z: percentages,
+            zmin: 30, zmax: 70,
             colorscale: [
-                [0, '#e8f5e9'],    
-                [0.5, '#66bb6a'],    
-                [1, '#1b5e20']      
+                [0, '#e8f5e9'], [0.5, '#66bb6a'], [1, '#1b5e20']      
             ],
-            colorbar: {
-                title: 'CFE %',
-                ticksuffix: '%'
-            },
-            marker: {
-                line: {
-                    color: 'gray',
-                    width: 0.5
-                }
-            }
+            colorbar: { title: 'CFE %', ticksuffix: '%' },
+            marker: { line: {color: 'gray', width: 0.5 } }
         }];
-
 
         var layout = {
             title: '',
-            geo: {
-                projection: {
-                    type: 'natural earth'
-                }
-            },
-            margin: { t: 50, l: 0, r: 0, b: 0 }
-        };
-
+            geo: { projection: {
+                    type: 'natural earth' } },
+            margin: { t: 50, l: 0, r: 0, b: 0 } };
         Plotly.newPlot('cfeMapChart', data, layout);
     </script>
 }

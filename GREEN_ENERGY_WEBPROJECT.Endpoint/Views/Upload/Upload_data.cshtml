@@ -152,15 +152,15 @@
             if (msg) {
                 setTimeout(() => {
                     msg.classList.add("fade-out");
-                    setTimeout(() => msg.remove(), 1000); // teljes törlés 1 másodperc után
-                }, 4000); // 4 másodperc után indul az eltűnés
+                    setTimeout(() => msg.remove(), 1000);
+                }, 4000);
             }
         };
 
         function loadFormFields() {
             const selectedTable = document.getElementById("tableSelector").value;
             const formFields = document.getElementById("formFields");
-            formFields.innerHTML = ""; // Clear previous fields
+            formFields.innerHTML = "";
 
             let fields = [];
 

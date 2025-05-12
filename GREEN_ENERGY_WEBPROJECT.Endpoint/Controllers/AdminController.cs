@@ -2,16 +2,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using GREEN_ENERGY_WEBPROJECT.Endpoint.Models; // <-- hozzá kell adnod!
+using GREEN_ENERGY_WEBPROJECT.Endpoint.Models;
 
 namespace GREEN_ENERGY_WEBPROJECT.Controllers
 {
     [Authorize]
     public class AdminController : Controller
     {
-        private readonly UserManager<Users> _userManager; // <<< IdentityUser helyett Users!
+        private readonly UserManager<Users> _userManager;
 
-        public AdminController(UserManager<Users> userManager) // <<< IdentityUser helyett Users!
+        public AdminController(UserManager<Users> userManager)
         {
             _userManager = userManager;
         }

@@ -76,8 +76,8 @@
 
         <form method="get" action="@Url.Action("ThirdDiagram", "Diagram")">
             <label for="factory">Factory:</label>
-            @Html.DropDownList("factory", ViewBag.Factories as SelectList, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block; margin-right: 10px;" })
-
+            @Html.DropDownList("factory", ViewBag.Factories as SelectList, "Select a factory", 
+                new { @class = "form-control", style = "width: 200px; display: inline-block; margin-right: 10px;" })
             <button type="submit">Filter</button>
         </form>
 

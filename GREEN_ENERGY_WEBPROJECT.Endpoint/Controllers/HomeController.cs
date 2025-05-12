@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using GREEN_ENERGY_WEBPROJECT.Endpoint.Models;
-using GREEN_ENERGY_WEBPROJECT.Endpoint.Data; // <<< ezt is add hozzá
+using GREEN_ENERGY_WEBPROJECT.Endpoint.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GREEN_ENERGY_WEBPROJECT.Models;
@@ -10,12 +10,12 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly AppDbContext _context; // <<< új sor
+        private readonly AppDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, AppDbContext context) // <<< context is jön ide
+        public HomeController(ILogger<HomeController> logger, AppDbContext context)
         {
             _logger = logger;
-            _context = context; // <<< ezt elmentjük
+            _context = context;
         }
 
         public async Task<IActionResult> Index()

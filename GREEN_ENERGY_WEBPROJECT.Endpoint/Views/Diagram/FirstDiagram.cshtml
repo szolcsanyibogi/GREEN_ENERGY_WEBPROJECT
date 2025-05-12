@@ -74,12 +74,14 @@
     <div class="diag-content">
         <div class="section-title">PUE Averages per Company (2019–2023)</div>
 
-        <form method="get" action="@Url.Action("SecondDiagram", "Diagram")">
+        <form method="get" action="@Url.Action("FirstDiagram", "Diagram")">
             <label for="factory">Factory:</label>
-            @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+            @Html.DropDownList("factoryId", (SelectList)ViewBag.Factories, "Select a factory", 
+            new { @class = "form-control", style = "width: 200px; display: inline-block;" })
 
             <label for="year">Year:</label>
-            @Html.DropDownList("year", (SelectList)ViewBag.Years, "Select a year", new { @class = "form-control", style = "width: 200px; display: inline-block;" })
+            @Html.DropDownList("year", (SelectList)ViewBag.Years, "Select a year", 
+            new { @class = "form-control", style = "width: 200px; display: inline-block;" })
 
             <button type="submit">Filter</button>
         </form>

@@ -39,11 +39,10 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
 
                 if (result.Succeeded)
                 {
-                    // 🔽 Itt manuálisan új claim-identity-t hozunk létre
                     var userClaims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, user.Email),
-                        new Claim("Factory", user.Factory.ToString().ToLower()) // "true" vagy "false"
+                        new Claim("Factory", user.Factory.ToString().ToLower())
                     };
 
                     var identity = new ClaimsIdentity(userClaims, "Identity.Application");
@@ -85,10 +84,9 @@ namespace GREEN_ENERGY_WEBPROJECT.Endpoint.Controllers
 
                 if (result.Succeeded)
                 {
-                    // 🔽 Új kód: claim hozzáadása a Factory mező alapján
                     var claims = new List<Claim>
                     {
-                        new Claim("Factory", users.Factory.ToString().ToLower()) // "true" vagy "false"
+                        new Claim("Factory", users.Factory.ToString().ToLower())
                     };
 
                     await userManager.AddClaimsAsync(users, claims);
